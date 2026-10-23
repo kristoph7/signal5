@@ -2810,6 +2810,197 @@ const NET = (() => {
 </script>
 <script>
 'use strict';
+/* ================= SIGNAL 5 — GUIDED TUTORIAL (coach marks) ================= */
+const Tutorial = (() => {
+  const T = { on: false, i: 0, timer: null, raf: null };
+  const q = (id) => document.getElementById(id);
+  const me = () => GAME.S && GAME.S.p[0];
+  const STEPS = [
+    { title: 'Welcome, Kapitan!', text: 'SIGNAL 5 is a 1-vs-1 disaster drill. You defend your barangay and send disasters at your rival. After Round 10 a Tsunami hits both villages, and the highest <b>Village Integrity</b> wins.', target: null, next: 'LET’S GO' },
+    { title: 'Your barangay', text: 'This 4×4 grid is your island town. <b>Row 1</b> (the dashed cyan line) faces the sea, so the final Tsunami hits it hardest.', target: 'board', next: 'NEXT' },
+    { title: 'Build the Barangay Hall', text: 'Tap any tile, then press <b>BUILD</b> on the Barangay Hall. Tip: keep it away from the coast.', target: 'board', until: () => !!Eng.hall(me()) },
+    { title: 'Fill your village', text: 'You need at least <b>8 buildings</b>. Tap <b>📋 SAMPLE</b> for a ready-made layout, or tap tiles to build your own.', target: '#btnCancel', until: () => Eng.buildingCount(me()) >= 8 },
+    { title: 'Walls & drains', text: 'Firewalls and Drainage canals go on the <b>lines between tiles</b>. Tap 🧱 to show the lines, then tap one to build. Firewalls stop fire spreading; drains stop floods spreading.', target: '#tEdge', next: 'GOT IT' },
+    { title: 'Ready!', text: 'Press <b>READY ✓</b>. Both layouts are revealed at the same time.', target: '#btnEnd', until: () => GAME.phase !== 'build' },
+    { title: 'Scout your rival', text: 'This is the CPU’s barangay. Look for crowded houses (fire spreads between them) and tiles without drains. Press <b>CONTINUE</b> when you’re ready.', target: '#btnEnd', place: 'top', until: () => GAME.phase !== 'reveal' && GAME.phase !== 'waitbuild', wait: () => GAME.phase === 'reveal' },
+    { title: 'Your opening hand', text: 'Pick <b>2 cards</b> to start with and press CONFIRM. Then keep your hand, or tap cards to reroll them once.', target: null, place: 'bottom', until: () => GAME.phase === 'action', wait: () => GAME.phase === 'plan' },
+    { title: 'Your cards', text: '<b>⚔️ Hazards</b> attack your rival. <b>🛡️ Preparedness</b> cards protect you. The gold coin shows your <b>Command Points (CP)</b>; every card costs CP. Gray cards can’t be played yet.', target: '#hand', next: 'NEXT' },
+    { title: 'Read any card', text: '<b>Hold a card for 2 seconds</b> (or hover over it with a mouse) to read exactly what it does.', target: '#hand', next: 'NEXT' },
+    { title: 'Attack!', text: 'Tap a <b>Hazard</b> card, then tap a tile on the CPU’s island. The yellow numbers show the damage it will deal. Then press <b>PLAY CARD</b>.', target: '#hand', until: () => (GAME.playedCount || 0) >= 1 || GAME.phase !== 'action', soft: true },
+    { title: 'Run your town', text: 'Tap your own buildings to repair, upgrade, evacuate or <b>hire workers</b>. Workers are residents with a job and cost 2 Pondo. Tap or hover the numbers at the top to learn what each one means.', target: '#res', next: 'NEXT' },
+    { title: 'End your turn', text: 'Press <b>END TURN</b> when you’re done. Burning tiles take damage, then you discard 1 card and draw back to 5.', target: '#btnEnd', until: () => GAME.phase !== 'action', wait: () => GAME.phase === 'action' },
+    { title: 'Turn order', text: 'This shows who plays this round. The first player <b>swaps every round</b>, so sometimes one side plays twice in a row. That’s the initiative rule, not a bug.', target: '#order', next: 'NEXT' },
+    { title: 'You’re ready!', text: 'Survive 10 rounds and the Tsunami with the highest Integrity %. Good luck, Kapitan! You can replay this tutorial from ⚙️ Settings.', target: '#integ', next: 'FINISH' },
+  ];
+
+  function boardRect() {
+    const k0 = R.corners(0), k3 = R.corners(3), k15 = R.corners(15), k12 = R.corners(12);
+    const pts = [k0.T, k3.Rr, k15.B, k12.L].map(p => R.w2s(p[0], p[1]));
+    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+    return { left: Math.min(...xs) - 10, top: Math.min(...ys) - 70, right: Math.max(...xs) + 10, bottom: Math.max(...ys) + 10 };
+  }
+  function rectOf(t) {
+    if (!t) return null;
+    if (t === 'board') { const r = boardRect(); return { left: r.left, top: r.top, width: r.right - r.left, height: r.bottom - r.top }; }
+    const el = document.querySelector(t); if (!el) return null;
+    const r = el.getBoundingClientRect(); if (!r.width && !r.height) return null;
+    return { left: r.left, top: r.top, width: r.width, height: r.height };
+  }
+  function place() {
+    if (!T.on) return;
+    const st = STEPS[T.i]; const spot = q('spot'), bub = q('bubble');
+    const W = window.innerWidth, H = window.innerHeight;
+    const r = rectOf(st.target);
+    if (r) {
+      const pad = 8; spot.classList.remove('none');
+      Object.assign(spot.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
+    } else spot.classList.add('none');
+    const bw = bub.offsetWidth, bh = bub.offsetHeight; let x, y;
+    const subB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--subB')) || 80;
+    if (st.place === 'top') { x = (W - bw) / 2; y = subB + 4; }
+    else if (!r) { x = (W - bw) / 2; y = st.place === 'bottom' ? H - bh - 16 : (H - bh) / 2; }
+    else {
+      x = r.left + r.width / 2 - bw / 2;
+      const below = r.top + r.height + 16, above = r.top - bh - 16;
+      if (below + bh < H - 8 && (r.top < H * 0.45 || above < 8)) y = below;
+      else if (above >= 8) y = above;
+      else if (r.left + r.width + 16 + bw < W) { x = r.left + r.width + 16; y = r.top + r.height / 2 - bh / 2; }
+      else if (r.left - 16 - bw > 0) { x = r.left - 16 - bw; y = r.top + r.height / 2 - bh / 2; }
+      else { x = W - bw - 10; y = H - bh - 70; }
+    }
+    bub.style.left = Math.max(8, Math.min(W - bw - 8, x)) + 'px'; bub.style.top = Math.max(8, Math.min(H - bh - 8, y)) + 'px';
+    T.raf = requestAnimationFrame(place);
+  }
+  function render() {
+    const st = STEPS[T.i]; const bub = q('bubble');
+    const waiting = st.wait && !st.wait();
+    bub.innerHTML = `<div class="cs">TUTORIAL · STEP ${T.i + 1} OF ${STEPS.length}</div><h4>${st.title}</h4><p>${st.text}</p>
+      ${st.until ? `<div class="wait">${waiting ? '⏳ Wait for it…' : '👉 Your move — the tutorial continues when you do it.'}</div>` : ''}
+      <div class="row"><button class="btn blue" id="tutSkip">Skip tutorial</button>${st.next ? `<button class="btn gold" id="tutNext">${st.next}</button>` : (st.soft ? '<button class="btn blue" id="tutNext">Skip step</button>' : '')}</div>`;
+    q('tutSkip').onclick = () => end(true);
+    const n = q('tutNext'); if (n) n.onclick = () => { SFX.play('click'); go(T.i + 1); };
+    vis();
+  }
+  function vis() {
+    const st = STEPS[T.i]; const waiting = st.wait && !st.wait();
+    const busy = q('sheet').classList.contains('open') || !q('inspect').classList.contains('hidden') || !q('modal').classList.contains('hidden');
+    q('coach').classList.toggle('hidden', !!waiting || busy);
+  }
+  function go(i) {
+    if (i >= STEPS.length) return end(false);
+    T.i = i; render();
+  }
+  function poll() {
+    if (!T.on) return;
+    const st = STEPS[T.i];
+    vis();
+    if (st.until && (!st.wait || st.wait() || st.until()) && st.until()) { go(T.i + 1); }
+  }
+  function end(skipped) {
+    T.on = false; clearInterval(T.timer); cancelAnimationFrame(T.raf);
+    q('coach').classList.add('hidden'); GAME.tutorial = false;
+    try { localStorage.setItem('signal5.tutDone', '1'); } catch (e) {}
+    if (!skipped) toast('🎓 Tutorial complete — keep playing this match!', 'good');
+  }
+  T.start = () => {
+    closeModal && closeModal();
+    GAME.tutorial = true; GAME.mode = 'cpu'; GAME.oppName = 'CPU'; GAME.aiLevel = 0; GAME.deckKey = 'balanced';
+    const seed = (Math.random() * 2 ** 31) | 0;
+    GAME.cpuDeckName = DECKS.balanced.name;
+    const S = GAME.S = Eng.newGame(seed, deckList(DECKS.balanced), deckList(DECKS.balanced), ['You', 'CPU']);
+    S.seedLog = seed; GAME.log = []; S.playerA = 0;
+    enterBuild();
+    T.on = true; T.i = 0; render();
+    clearInterval(T.timer); T.timer = setInterval(poll, 300);
+    cancelAnimationFrame(T.raf); T.raf = requestAnimationFrame(place);
+  };
+  T.active = () => T.on;
+  return T;
+})();
+window.Tutorial = Tutorial;
+
+</script>
+<script>
+'use strict';
+/* ================= SIGNAL 5 — LIVING TITLE BACKGROUND ================= */
+const Menu = (() => {
+  const M = { on: false };
+  let cv, ctx, layer, lctx, smoke = [], gulls = [], clouds = [], last = 0, t = 0;
+  const VOLC = { x: 292, y: 18 };   // crater in menu_bg pixels
+  function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+  function fit() {
+    const r = cv.getBoundingClientRect(); const dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    return { w: r.width, h: r.height, dpr };
+  }
+  M.start = () => {
+    cv = document.getElementById('tcv'); if (!cv || !R.imgs.menu_bg) return;
+    ctx = cv.getContext('2d');
+    const wm = R.imgs.menuWater; layer = mk(wm ? wm.width : 516, wm ? wm.height : 470); lctx = layer.getContext('2d');
+    for (let i = 0; i < 3; i++) clouds.push({ x: Math.random() * 1300 - 200, y: Math.random() * 900, s: 0.8 + Math.random() * 0.8, v: 9 + Math.random() * 7 });
+    for (let i = 0; i < 2; i++) gulls = R.gullStep(gulls, 0.5, 1032, 941, 2, 99);
+    gulls.forEach(g => g.x = 200 + Math.random() * 600);
+    document.getElementById('tbg').classList.add('live');
+    M.on = true; last = performance.now(); requestAnimationFrame(loop);
+  };
+  function loop(now) {
+    if (!M.on) return;
+    const title = document.getElementById('title');
+    if (title.classList.contains('hidden')) { requestAnimationFrame(loop); last = now; return; }
+    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
+    try { step(dt); draw(); } catch (e) { console.error(e); }
+    requestAnimationFrame(loop);
+  }
+  function step(dt) {
+    gulls = R.gullStep(gulls, dt, 1032, 941, 3, 0.35);
+    for (const c of clouds) { c.x += c.v * dt; if (c.x > 1400) { c.x = -500; c.y = Math.random() * 900; } }
+    if (Math.random() < dt * 7) smoke.push({ x: VOLC.x + (Math.random() - 0.5) * 16, y: VOLC.y, vx: 8 + Math.random() * 8, vy: -16 - Math.random() * 10, r: 6 + Math.random() * 5, life: 0, max: 4 + Math.random() * 2 });
+    for (const p of smoke) { p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += 7 * dt; }
+    smoke = smoke.filter(p => p.life < p.max);
+  }
+  function draw() {
+    const bg = R.imgs.menu_bg, wm = R.imgs.menuWater; const { w, h, dpr } = fit();
+    const port = window.innerWidth / window.innerHeight < 1;
+    const zoom = 1.02 + 0.035 * (0.5 + 0.5 * Math.sin(t * 0.06));
+    let hh = h; if (port) { const pt = document.getElementById('tpanel').getBoundingClientRect().top; hh = Math.min(h, Math.max(h * 0.3, pt + 90)); }
+    const s = Math.max(w / bg.width, hh / bg.height) * zoom;
+    const fx = port ? 0.55 : 0.5, fy = 0.45;
+    const ox = (w - bg.width * s) * fx + Math.sin(t * 0.045) * 10, oy = (hh - bg.height * s) * fy + Math.cos(t * 0.05) * 6;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = '#005fc0'; ctx.fillRect(0, 0, w, h);
+    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
+    ctx.imageSmoothingEnabled = true; ctx.drawImage(bg, 0, 0);
+    // animated water: swells + forming crests + shallow caustics, clipped to the sea
+    if (wm && R.patCrest) {
+      const L = lctx, W = layer.width, H = layer.height;
+      L.globalCompositeOperation = 'source-over'; L.clearRect(0, 0, W, H);
+      const ps = L.createPattern(R.patSwell, 'repeat'); ps.setTransform(new DOMMatrix().translateSelf((t * 10) % 256, (t * 14) % 256).rotateSelf(-24).scaleSelf(1.3, 1.3));
+      L.globalAlpha = 0.5; L.fillStyle = ps; L.fillRect(0, 0, W, H);
+      const a1 = 0.5 + 0.5 * Math.sin(t * 1.1), a2 = 1 - a1;
+      const c1 = L.createPattern(R.patCrest, 'repeat'); c1.setTransform(new DOMMatrix().translateSelf((t * 13) % 256, (t * 6) % 256).scaleSelf(0.5, 0.5));
+      L.globalAlpha = 0.25 + 0.7 * a1; L.fillStyle = c1; L.fillRect(0, 0, W, H);
+      const c2 = L.createPattern(R.patCrest, 'repeat'); c2.setTransform(new DOMMatrix().translateSelf(-(t * 9) % 256 + 91, (t * 7) % 256 + 40).scaleSelf(0.5, 0.5));
+      L.globalAlpha = 0.25 + 0.7 * a2; L.fillStyle = c2; L.fillRect(0, 0, W, H);
+      L.globalAlpha = 1; L.globalCompositeOperation = 'destination-in'; L.drawImage(wm, 0, 0, W, H);
+      ctx.save(); ctx.globalAlpha = 0.55; ctx.imageSmoothingEnabled = false; ctx.drawImage(layer, 0, 0, bg.width, bg.height); ctx.restore();
+    }
+    // volcano smoke
+    ctx.save();
+    for (const p of smoke) { const k = p.life / p.max; ctx.globalAlpha = 0.28 * (1 - k) * Math.min(1, p.life * 2); ctx.fillStyle = '#8c8282'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+    // drifting cloud shadows
+    ctx.save(); ctx.fillStyle = 'rgba(0,12,45,0.08)';
+    for (const c of clouds) { ctx.beginPath(); ctx.ellipse(c.x, c.y, 190 * c.s, 80 * c.s, 0, 0, Math.PI * 2); ctx.ellipse(c.x + 120 * c.s, c.y - 20 * c.s, 130 * c.s, 60 * c.s, 0, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+    R.drawGullList(ctx, gulls, 1.35, true);
+  }
+  return M;
+})();
+window.Menu = Menu;
+
+</script>
+<script>
+'use strict';
 /* ================= SIGNAL 5 — GAME CONTROLLER & UI ================= */
 const $ = (id) => document.getElementById(id);
 const GAME = window.GAME = {
@@ -2838,7 +3029,7 @@ function applySettings() {
   $('tbg').style.backgroundImage = 'url(' + A('menu_bg') + ')'; $('tpanel').style.backgroundImage = 'url(' + A('menu_panel') + ')';
   document.querySelectorAll('#tBtns img[data-a]').forEach(im => im.src = A(im.dataset.a)); layoutInsets();
   await R.load(p => { $('loadI').style.width = Math.round(p * 100) + '%'; });
-  R.init($('board')); Menu.start();
+  R.init($('board')); try { if (window.Menu) Menu.start(); } catch (e) { console.error(e); }
   // demo village on title
   const demo = Eng.newGame(12345, deckList(DECKS.balanced), deckList(DECKS.balanced), ['Demo', 'Demo']);
   Eng.applyLayout(demo, demo.p[0], LAYOUTS[0]); demo.p[0].tiles[3] = Eng.makeBuilding('school'); demo.p[0].tiles[3].res = 0;
@@ -3878,197 +4069,6 @@ function workersHTML(b, d, canAct) {
   }
   return '';
 }
-
-</script>
-<script>
-'use strict';
-/* ================= SIGNAL 5 — GUIDED TUTORIAL (coach marks) ================= */
-const Tutorial = (() => {
-  const T = { on: false, i: 0, timer: null, raf: null };
-  const q = (id) => document.getElementById(id);
-  const me = () => GAME.S && GAME.S.p[0];
-  const STEPS = [
-    { title: 'Welcome, Kapitan!', text: 'SIGNAL 5 is a 1-vs-1 disaster drill. You defend your barangay and send disasters at your rival. After Round 10 a Tsunami hits both villages, and the highest <b>Village Integrity</b> wins.', target: null, next: 'LET’S GO' },
-    { title: 'Your barangay', text: 'This 4×4 grid is your island town. <b>Row 1</b> (the dashed cyan line) faces the sea, so the final Tsunami hits it hardest.', target: 'board', next: 'NEXT' },
-    { title: 'Build the Barangay Hall', text: 'Tap any tile, then press <b>BUILD</b> on the Barangay Hall. Tip: keep it away from the coast.', target: 'board', until: () => !!Eng.hall(me()) },
-    { title: 'Fill your village', text: 'You need at least <b>8 buildings</b>. Tap <b>📋 SAMPLE</b> for a ready-made layout, or tap tiles to build your own.', target: '#btnCancel', until: () => Eng.buildingCount(me()) >= 8 },
-    { title: 'Walls & drains', text: 'Firewalls and Drainage canals go on the <b>lines between tiles</b>. Tap 🧱 to show the lines, then tap one to build. Firewalls stop fire spreading; drains stop floods spreading.', target: '#tEdge', next: 'GOT IT' },
-    { title: 'Ready!', text: 'Press <b>READY ✓</b>. Both layouts are revealed at the same time.', target: '#btnEnd', until: () => GAME.phase !== 'build' },
-    { title: 'Scout your rival', text: 'This is the CPU’s barangay. Look for crowded houses (fire spreads between them) and tiles without drains. Press <b>CONTINUE</b> when you’re ready.', target: '#btnEnd', place: 'top', until: () => GAME.phase !== 'reveal' && GAME.phase !== 'waitbuild', wait: () => GAME.phase === 'reveal' },
-    { title: 'Your opening hand', text: 'Pick <b>2 cards</b> to start with and press CONFIRM. Then keep your hand, or tap cards to reroll them once.', target: null, place: 'bottom', until: () => GAME.phase === 'action', wait: () => GAME.phase === 'plan' },
-    { title: 'Your cards', text: '<b>⚔️ Hazards</b> attack your rival. <b>🛡️ Preparedness</b> cards protect you. The gold coin shows your <b>Command Points (CP)</b>; every card costs CP. Gray cards can’t be played yet.', target: '#hand', next: 'NEXT' },
-    { title: 'Read any card', text: '<b>Hold a card for 2 seconds</b> (or hover over it with a mouse) to read exactly what it does.', target: '#hand', next: 'NEXT' },
-    { title: 'Attack!', text: 'Tap a <b>Hazard</b> card, then tap a tile on the CPU’s island. The yellow numbers show the damage it will deal. Then press <b>PLAY CARD</b>.', target: '#hand', until: () => (GAME.playedCount || 0) >= 1 || GAME.phase !== 'action', soft: true },
-    { title: 'Run your town', text: 'Tap your own buildings to repair, upgrade, evacuate or <b>hire workers</b>. Workers are residents with a job and cost 2 Pondo. Tap or hover the numbers at the top to learn what each one means.', target: '#res', next: 'NEXT' },
-    { title: 'End your turn', text: 'Press <b>END TURN</b> when you’re done. Burning tiles take damage, then you discard 1 card and draw back to 5.', target: '#btnEnd', until: () => GAME.phase !== 'action', wait: () => GAME.phase === 'action' },
-    { title: 'Turn order', text: 'This shows who plays this round. The first player <b>swaps every round</b>, so sometimes one side plays twice in a row. That’s the initiative rule, not a bug.', target: '#order', next: 'NEXT' },
-    { title: 'You’re ready!', text: 'Survive 10 rounds and the Tsunami with the highest Integrity %. Good luck, Kapitan! You can replay this tutorial from ⚙️ Settings.', target: '#integ', next: 'FINISH' },
-  ];
-
-  function boardRect() {
-    const k0 = R.corners(0), k3 = R.corners(3), k15 = R.corners(15), k12 = R.corners(12);
-    const pts = [k0.T, k3.Rr, k15.B, k12.L].map(p => R.w2s(p[0], p[1]));
-    const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
-    return { left: Math.min(...xs) - 10, top: Math.min(...ys) - 70, right: Math.max(...xs) + 10, bottom: Math.max(...ys) + 10 };
-  }
-  function rectOf(t) {
-    if (!t) return null;
-    if (t === 'board') { const r = boardRect(); return { left: r.left, top: r.top, width: r.right - r.left, height: r.bottom - r.top }; }
-    const el = document.querySelector(t); if (!el) return null;
-    const r = el.getBoundingClientRect(); if (!r.width && !r.height) return null;
-    return { left: r.left, top: r.top, width: r.width, height: r.height };
-  }
-  function place() {
-    if (!T.on) return;
-    const st = STEPS[T.i]; const spot = q('spot'), bub = q('bubble');
-    const W = window.innerWidth, H = window.innerHeight;
-    const r = rectOf(st.target);
-    if (r) {
-      const pad = 8; spot.classList.remove('none');
-      Object.assign(spot.style, { left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
-    } else spot.classList.add('none');
-    const bw = bub.offsetWidth, bh = bub.offsetHeight; let x, y;
-    const subB = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--subB')) || 80;
-    if (st.place === 'top') { x = (W - bw) / 2; y = subB + 4; }
-    else if (!r) { x = (W - bw) / 2; y = st.place === 'bottom' ? H - bh - 16 : (H - bh) / 2; }
-    else {
-      x = r.left + r.width / 2 - bw / 2;
-      const below = r.top + r.height + 16, above = r.top - bh - 16;
-      if (below + bh < H - 8 && (r.top < H * 0.45 || above < 8)) y = below;
-      else if (above >= 8) y = above;
-      else if (r.left + r.width + 16 + bw < W) { x = r.left + r.width + 16; y = r.top + r.height / 2 - bh / 2; }
-      else if (r.left - 16 - bw > 0) { x = r.left - 16 - bw; y = r.top + r.height / 2 - bh / 2; }
-      else { x = W - bw - 10; y = H - bh - 70; }
-    }
-    bub.style.left = Math.max(8, Math.min(W - bw - 8, x)) + 'px'; bub.style.top = Math.max(8, Math.min(H - bh - 8, y)) + 'px';
-    T.raf = requestAnimationFrame(place);
-  }
-  function render() {
-    const st = STEPS[T.i]; const bub = q('bubble');
-    const waiting = st.wait && !st.wait();
-    bub.innerHTML = `<div class="cs">TUTORIAL · STEP ${T.i + 1} OF ${STEPS.length}</div><h4>${st.title}</h4><p>${st.text}</p>
-      ${st.until ? `<div class="wait">${waiting ? '⏳ Wait for it…' : '👉 Your move — the tutorial continues when you do it.'}</div>` : ''}
-      <div class="row"><button class="btn blue" id="tutSkip">Skip tutorial</button>${st.next ? `<button class="btn gold" id="tutNext">${st.next}</button>` : (st.soft ? '<button class="btn blue" id="tutNext">Skip step</button>' : '')}</div>`;
-    q('tutSkip').onclick = () => end(true);
-    const n = q('tutNext'); if (n) n.onclick = () => { SFX.play('click'); go(T.i + 1); };
-    vis();
-  }
-  function vis() {
-    const st = STEPS[T.i]; const waiting = st.wait && !st.wait();
-    const busy = q('sheet').classList.contains('open') || !q('inspect').classList.contains('hidden') || !q('modal').classList.contains('hidden');
-    q('coach').classList.toggle('hidden', !!waiting || busy);
-  }
-  function go(i) {
-    if (i >= STEPS.length) return end(false);
-    T.i = i; render();
-  }
-  function poll() {
-    if (!T.on) return;
-    const st = STEPS[T.i];
-    vis();
-    if (st.until && (!st.wait || st.wait() || st.until()) && st.until()) { go(T.i + 1); }
-  }
-  function end(skipped) {
-    T.on = false; clearInterval(T.timer); cancelAnimationFrame(T.raf);
-    q('coach').classList.add('hidden'); GAME.tutorial = false;
-    try { localStorage.setItem('signal5.tutDone', '1'); } catch (e) {}
-    if (!skipped) toast('🎓 Tutorial complete — keep playing this match!', 'good');
-  }
-  T.start = () => {
-    closeModal && closeModal();
-    GAME.tutorial = true; GAME.mode = 'cpu'; GAME.oppName = 'CPU'; GAME.aiLevel = 0; GAME.deckKey = 'balanced';
-    const seed = (Math.random() * 2 ** 31) | 0;
-    GAME.cpuDeckName = DECKS.balanced.name;
-    const S = GAME.S = Eng.newGame(seed, deckList(DECKS.balanced), deckList(DECKS.balanced), ['You', 'CPU']);
-    S.seedLog = seed; GAME.log = []; S.playerA = 0;
-    enterBuild();
-    T.on = true; T.i = 0; render();
-    clearInterval(T.timer); T.timer = setInterval(poll, 300);
-    cancelAnimationFrame(T.raf); T.raf = requestAnimationFrame(place);
-  };
-  T.active = () => T.on;
-  return T;
-})();
-window.Tutorial = Tutorial;
-
-</script>
-<script>
-'use strict';
-/* ================= SIGNAL 5 — LIVING TITLE BACKGROUND ================= */
-const Menu = (() => {
-  const M = { on: false };
-  let cv, ctx, layer, lctx, smoke = [], gulls = [], clouds = [], last = 0, t = 0;
-  const VOLC = { x: 292, y: 18 };   // crater in menu_bg pixels
-  function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
-  function fit() {
-    const r = cv.getBoundingClientRect(); const dpr = Math.min(1.5, window.devicePixelRatio || 1);
-    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
-    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
-    return { w: r.width, h: r.height, dpr };
-  }
-  M.start = () => {
-    cv = document.getElementById('tcv'); if (!cv || !R.imgs.menu_bg) return;
-    ctx = cv.getContext('2d');
-    const wm = R.imgs.menuWater; layer = mk(wm ? wm.width : 516, wm ? wm.height : 470); lctx = layer.getContext('2d');
-    for (let i = 0; i < 3; i++) clouds.push({ x: Math.random() * 1300 - 200, y: Math.random() * 900, s: 0.8 + Math.random() * 0.8, v: 9 + Math.random() * 7 });
-    for (let i = 0; i < 2; i++) gulls = R.gullStep(gulls, 0.5, 1032, 941, 2, 99);
-    gulls.forEach(g => g.x = 200 + Math.random() * 600);
-    document.getElementById('tbg').classList.add('live');
-    M.on = true; last = performance.now(); requestAnimationFrame(loop);
-  };
-  function loop(now) {
-    if (!M.on) return;
-    const title = document.getElementById('title');
-    if (title.classList.contains('hidden')) { requestAnimationFrame(loop); last = now; return; }
-    const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt;
-    try { step(dt); draw(); } catch (e) { console.error(e); }
-    requestAnimationFrame(loop);
-  }
-  function step(dt) {
-    gulls = R.gullStep(gulls, dt, 1032, 941, 3, 0.35);
-    for (const c of clouds) { c.x += c.v * dt; if (c.x > 1400) { c.x = -500; c.y = Math.random() * 900; } }
-    if (Math.random() < dt * 7) smoke.push({ x: VOLC.x + (Math.random() - 0.5) * 16, y: VOLC.y, vx: 8 + Math.random() * 8, vy: -16 - Math.random() * 10, r: 6 + Math.random() * 5, life: 0, max: 4 + Math.random() * 2 });
-    for (const p of smoke) { p.life += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.r += 7 * dt; }
-    smoke = smoke.filter(p => p.life < p.max);
-  }
-  function draw() {
-    const bg = R.imgs.menu_bg, wm = R.imgs.menuWater; const { w, h, dpr } = fit();
-    const port = window.innerWidth / window.innerHeight < 1;
-    const zoom = 1.02 + 0.035 * (0.5 + 0.5 * Math.sin(t * 0.06));
-    let hh = h; if (port) { const pt = document.getElementById('tpanel').getBoundingClientRect().top; hh = Math.min(h, Math.max(h * 0.3, pt + 90)); }
-    const s = Math.max(w / bg.width, hh / bg.height) * zoom;
-    const fx = port ? 0.55 : 0.5, fy = 0.45;
-    const ox = (w - bg.width * s) * fx + Math.sin(t * 0.045) * 10, oy = (hh - bg.height * s) * fy + Math.cos(t * 0.05) * 6;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.fillStyle = '#005fc0'; ctx.fillRect(0, 0, w, h);
-    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * ox, dpr * oy);
-    ctx.imageSmoothingEnabled = true; ctx.drawImage(bg, 0, 0);
-    // animated water: swells + forming crests + shallow caustics, clipped to the sea
-    if (wm && R.patCrest) {
-      const L = lctx, W = layer.width, H = layer.height;
-      L.globalCompositeOperation = 'source-over'; L.clearRect(0, 0, W, H);
-      const ps = L.createPattern(R.patSwell, 'repeat'); ps.setTransform(new DOMMatrix().translateSelf((t * 10) % 256, (t * 14) % 256).rotateSelf(-24).scaleSelf(1.3, 1.3));
-      L.globalAlpha = 0.5; L.fillStyle = ps; L.fillRect(0, 0, W, H);
-      const a1 = 0.5 + 0.5 * Math.sin(t * 1.1), a2 = 1 - a1;
-      const c1 = L.createPattern(R.patCrest, 'repeat'); c1.setTransform(new DOMMatrix().translateSelf((t * 13) % 256, (t * 6) % 256).scaleSelf(0.5, 0.5));
-      L.globalAlpha = 0.25 + 0.7 * a1; L.fillStyle = c1; L.fillRect(0, 0, W, H);
-      const c2 = L.createPattern(R.patCrest, 'repeat'); c2.setTransform(new DOMMatrix().translateSelf(-(t * 9) % 256 + 91, (t * 7) % 256 + 40).scaleSelf(0.5, 0.5));
-      L.globalAlpha = 0.25 + 0.7 * a2; L.fillStyle = c2; L.fillRect(0, 0, W, H);
-      L.globalAlpha = 1; L.globalCompositeOperation = 'destination-in'; L.drawImage(wm, 0, 0, W, H);
-      ctx.save(); ctx.globalAlpha = 0.55; ctx.imageSmoothingEnabled = false; ctx.drawImage(layer, 0, 0, bg.width, bg.height); ctx.restore();
-    }
-    // volcano smoke
-    ctx.save();
-    for (const p of smoke) { const k = p.life / p.max; ctx.globalAlpha = 0.28 * (1 - k) * Math.min(1, p.life * 2); ctx.fillStyle = '#8c8282'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill(); }
-    ctx.restore();
-    // drifting cloud shadows
-    ctx.save(); ctx.fillStyle = 'rgba(0,12,45,0.08)';
-    for (const c of clouds) { ctx.beginPath(); ctx.ellipse(c.x, c.y, 190 * c.s, 80 * c.s, 0, 0, Math.PI * 2); ctx.ellipse(c.x + 120 * c.s, c.y - 20 * c.s, 130 * c.s, 60 * c.s, 0, 0, Math.PI * 2); ctx.fill(); }
-    ctx.restore();
-    R.drawGullList(ctx, gulls, 1.35, true);
-  }
-  return M;
-})();
-window.Menu = Menu;
 
 </script>
 </body>
