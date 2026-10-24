@@ -4271,7 +4271,7 @@ async function auditOpponent(rv) {
   }
   return { ok: true, n };
 }
-function matchId(S) { let h = 2166136261; const str = [S.seedLog, GAME.priv && GAME.priv.commit, GAME.oppCommit, GAME.myName, GAME.oppName].join('|'); for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return 'S5-' + (h >>> 0).toString(36).toUpperCase().padStart(7, '0'); }
+function matchId(S) { let h = 2166136261; const names = S.playerA === 0 ? [GAME.myName, GAME.oppName] : [GAME.oppName, GAME.myName]; const str = [S.seedLog, ...[GAME.priv && GAME.priv.commit, GAME.oppCommit].sort(), ...names].join('|'); /* identical on both clients */ for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return 'S5-' + (h >>> 0).toString(36).toUpperCase().padStart(7, '0'); }
 function downloadJSON(name, obj) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
 function startOnline(seed, firstHost, oppDeck) {
   const v = validateDeck(oppDeck || {}); const od = v.ok ? oppDeck : DECKS.balanced.cards;
