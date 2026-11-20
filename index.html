@@ -460,6 +460,7 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none
 .qm-btn{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:4px solid #fff1b8;border-radius:16px;background:linear-gradient(#ffe68a,#ffb21f 55%,#f08a00);color:#2b1500;font:400 31px 'Lilita One',sans-serif;letter-spacing:.5px;line-height:1;cursor:pointer;box-shadow:0 6px 0 #8a4f00,0 0 22px #ffcf4a99;animation:qmPulse 1.6s ease-in-out infinite}
 .qm-btn small{font:900 16px Nunito,sans-serif;color:#5a3000;letter-spacing:0}
 #scQuick{font-size:27px;border-width:3px} .qm-btn.hs{font-size:21px;border-width:3px;background:linear-gradient(#bde9ff,#4fb4ff 55%,#1f7ee0);color:#06264a;box-shadow:0 4px 0 #0b3f7a;animation:none}
+@media (orientation:portrait) and (max-width:700px){#scene:not(.hidden)::before{content:'↻  Turn your phone sideways for a bigger view';position:fixed;top:max(14px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:5;padding:8px 14px;border-radius:999px;background:#071a3dee;border:2px solid #ffd23a;color:#ffe9a0;font:800 13px Nunito,sans-serif;white-space:nowrap;pointer-events:none}}
 #passfx{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at 50% 40%,#173a7a,#050d24 70%);color:#fff;text-align:center;font-family:'Lilita One',sans-serif}
 #passfx.hidden{display:none} #passfx small{font:800 18px Nunito,sans-serif;color:#9fc4ff;letter-spacing:1px} #passfx b{font-size:clamp(34px,7vw,64px);color:#ffd23a;text-shadow:0 4px 0 #000} #passfx p{font:700 17px Nunito,sans-serif;color:#cfe0ff;max-width:520px;margin:0 16px}
 #passfx button{font:400 26px 'Lilita One',sans-serif;padding:14px 34px;border-radius:16px;border:4px solid #fff1b8;background:linear-gradient(#ffe68a,#ffb21f 55%,#f08a00);color:#2b1500;cursor:pointer;box-shadow:0 6px 0 #8a4f00}
@@ -813,6 +814,8 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none
 [data-layout="port"] .grab{display:block}
 [data-layout="port"] #toasts{top:auto;bottom:calc(var(--botH) + 30px)}
 [data-layout="port"] #inspect{bottom:auto;top:calc(var(--subB) + 8px)}
+[data-layout="port"] #inspect.panel{width:calc(100vw - 74px);max-width:440px;grid-template-columns:34% 1fr}
+[data-layout="port"] #inspect.aim .ip-col>p{display:block;font-size:13px;line-height:1.3}
 
 /* ================= layout: short landscape (phones sideways) ================= */
 [data-layout="lands"]{--coin:50px}
@@ -862,7 +865,7 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none
 
 /* ================= wide but narrow-ish laptops ================= */
 @media (max-width:1500px){[data-layout="wide"] .chip .lb{font-size:10px}[data-layout="wide"] .chip{padding:3px 10px 3px 6px;gap:6px}[data-layout="wide"] .chip .ic{width:28px;height:28px}[data-layout="wide"] .chip .v{font-size:19px}[data-layout="wide"] .ibtn{width:38px;height:38px}}
-@media (max-width:1280px){[data-layout="wide"] .chip .lb{display:none}[data-layout="wide"] #badge small{display:none}[data-layout="wide"] #badge b{font-size:17px}[data-layout="wide"] #badge .av{width:42px;height:42px}[data-layout="wide"] #res{gap:4px;padding:0 8px}[data-layout="wide"] #status{width:240px}[data-layout="wide"] #right{width:250px}[data-layout="wide"] #wk{display:none}}
+@media (max-width:1280px){[data-layout="wide"] .chip .lb{display:block;font-size:9px;letter-spacing:.4px;opacity:.85;margin-bottom:1px}[data-layout="wide"] #badge small{display:none}[data-layout="wide"] #badge b{font-size:17px}[data-layout="wide"] #badge .av{width:42px;height:42px}[data-layout="wide"] #res{gap:4px;padding:0 8px}[data-layout="wide"] #status{width:240px}[data-layout="wide"] #right{width:250px}[data-layout="wide"] #wk{display:none}}
 @media (max-width:1060px){[data-layout="wide"] #bHelp,[data-layout="wide"] #bRules{display:none}[data-layout="wide"] #status{display:none}}
 
 @media (prefers-reduced-motion: reduce){ .card,.chip,#logo .spin{transition:none;animation:none} }
@@ -905,7 +908,7 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none
   </div>
 
   <div id="bottom" class="hidden">
-    <div id="phase"><img class="ii" data-a="ui_info" alt=""><span class="pt" id="phT">⚠ HAZARD PHASE</span><span class="sep"></span><span class="pd" id="phD">Select a card to prepare your move.</span></div>
+    <div id="phase"><img class="ii" data-a="ui_info" alt=""><span class="pt" id="phT">▶ YOUR TURN</span><span class="sep"></span><span class="pd" id="phD">Play a card, or tap your own tiles to build.</span></div>
     <div id="segbar" class="hidden"></div>
     <div id="cp" data-tip="cp"><small>CP</small><b id="cpV">0</b><span class="car hidden" id="cpCar">+1</span></div>
     <div id="wk" data-tip="act"><div class="wi"><img data-a="ui_worker" alt=""></div><b id="wkT">1 WORKER ACTION</b></div>
@@ -948,7 +951,7 @@ button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none
       <button class="tbtn" id="bHow" data-b="how" aria-label="How to play"><img alt=""></button>
       <button class="tbtn" id="bRules2" data-b="rules" aria-label="Rulebook"><img alt=""></button>
     </div>
-    <div class="ver">Rules v2.1 · GDD v2.0</div>
+    <div class="ver">Rules v2.1</div>
   </div>
 </div>
 <script>
@@ -993,60 +996,60 @@ const tileName = (i) => COLS[i % 4] + (Math.floor(i / 4) + 1);
 // mat: light | standard | concrete ; elev: elevated
 const BLD = {
   hall: { name: 'Barangay Hall', short: 'Hall', max: 1, icon: '🏛️', color: '#4caf50',
-    desc: 'Pondo income, houses DRRM Officers, evacuation shelter. Required.',
+    desc: 'Your town center. Earns Pondo every upkeep, houses your DRRM Officers and shelters evacuees. Every barangay needs one.',
     lv: [
       { title: 'Barangay Hall', mat: 'concrete', hp: 10, gen: 3, pondo: 4, shelter: 4, officers: 1, cap: 6, sprite: 'hall', cost: 0 },
       { title: 'Municipal Hall', mat: 'concrete', hp: 13, gen: 3, pondo: 6, shelter: 6, officers: 2, cap: 10, sprite: 'hall', cost: 12, kp: 4, round: 4 },
       { title: 'City Hall', mat: 'concrete', hp: 16, gen: 3, pondo: 8, shelter: 8, officers: 3, cap: 14, sprite: 'hall', cost: 18, kp: 8, round: 7 },
     ] },
   house: { name: 'House', short: 'House', max: 99, icon: '🛖', color: '#c8a26a',
-    desc: 'Houses residents. Residents earn +1 Pondo per 2 healthy.',
+    desc: 'Home for your residents. Every 2 healthy residents earn 1 Pondo per upkeep.',
     lv: [
       { title: 'Nipa Hut', mat: 'light', elev: true, hp: 4, res: 2, power: 0, cost: 3, sprite: 'nipa' },
       { title: 'Wood & GI House', mat: 'standard', hp: 7, res: 3, power: 0, cost: 3, sprite: 'house2', stage: 1 },
       { title: 'Concrete House', mat: 'concrete', hp: 10, res: 4, power: 1, cost: 5, sprite: 'house2', stage: 2, engineer: true },
     ] },
   farm: { name: 'Farm', short: 'Farm', max: 3, icon: '🌾', color: '#8bc34a',
-    desc: 'Produces Food. +1 Food if any edge has Drainage (irrigated).',
+    desc: 'Grows Food every upkeep. Gives 1 extra Food when a drain touches it (irrigation).',
     lv: [
       { title: 'Rice Farm', mat: 'light', hp: 4, food: 3, power: 0, cost: 4, sprite: 'farm' },
       { title: 'Irrigated Farm', mat: 'standard', hp: 7, food: 5, power: 0, cost: 4, sprite: 'farm', stage: 2 },
     ] },
   substation: { name: 'Substation', short: 'Substation', max: 2, icon: '⚡', color: '#ffc107',
-    desc: 'Supplies Power. Shorts when Flooded unless it has a Drainage edge.',
+    desc: 'Powers your buildings. Shorts out when flooded unless a drain touches it.',
     lv: [
       { title: 'Substation', mat: 'standard', hp: 7, supply: 6, power: 0, cost: 6, sprite: 'substation' },
       { title: 'Concrete Substation', mat: 'concrete', hp: 10, supply: 9, power: 0, cost: 5, sprite: 'substation', stage: 2 },
     ] },
   school: { name: 'School', short: 'School', max: 2, icon: '🏫', color: '#26a69a',
-    desc: 'Produces Knowledge Points. Evacuation shelter.',
+    desc: 'Earns Knowledge Points (KP) every upkeep and shelters evacuees.',
     lv: [
       { title: 'School', mat: 'standard', hp: 7, kp: 2, shelter: 3, power: 2, cost: 6, sprite: 'school' },
       { title: 'Two-Storey School', mat: 'concrete', hp: 10, kp: 3, shelter: 5, power: 2, cost: 5, sprite: 'school2', stage: 2 },
     ] },
   health: { name: 'Barangay Health Center', short: 'Health Ctr', max: 2, icon: '🏥', color: '#ef5350',
-    desc: 'BHW slots. Barangay Health Workers heal Injured residents.',
+    desc: 'Barangay Health Workers heal injured residents every upkeep. A trained Nurse heals 2 and keeps the injured from leaving.',
     worker: 'BHW', workerUp: 'Nurse',
     lv: [
       { title: 'Health Center', mat: 'standard', hp: 7, slots: 2, power: 2, cost: 6, sprite: 'health' },
       { title: 'Concrete Health Center', mat: 'concrete', hp: 10, slots: 3, power: 2, cost: 5, sprite: 'health', stage: 2 },
     ] },
   fire: { name: 'Fire Station', short: 'Fire Stn', max: 2, icon: '🚒', color: '#f44336',
-    desc: 'Firefighters extinguish Burning tokens. Covered tiles take −1 Fire.',
+    desc: 'Firefighters put out fires every upkeep. Tiles it covers take 1 less Fire damage.',
     worker: 'Firefighter',
     lv: [
       { title: 'Fire Station', mat: 'standard', hp: 7, slots: 2, cover: 1, power: 1, cost: 6, sprite: 'fire' },
       { title: 'Concrete Fire Station', mat: 'concrete', hp: 10, slots: 3, cover: 2, power: 1, cost: 5, sprite: 'fire', stage: 2 },
     ] },
   cons: { name: 'Construction Office', short: 'Constr.', max: 1, icon: '🏗️', color: '#ff7043',
-    desc: 'Construction Workers: 1 worker action each (build, upgrade, repair, segments).',
+    desc: 'Each Construction Worker gives 1 worker action per turn: build, upgrade, repair, or add walls and drains.',
     worker: 'Constr. Worker', workerUp: 'Engineer',
     lv: [
       { title: 'Construction Office', mat: 'standard', hp: 7, slots: 2, power: 1, cost: 5, sprite: 'dpwh', small: true },
       { title: 'DPWH District Office', mat: 'concrete', hp: 10, slots: 3, power: 2, cost: 6, sprite: 'dpwh', stage: 2 },
     ] },
   grove: { name: 'Grove', short: 'Grove', max: 2, icon: '🌳', color: '#2e7d32',
-    desc: 'Adjacent tiles take −1 Wind and −1 Flood (incl. Tsunami). Can Burn.',
+    desc: 'Mangroves shield their neighbors: adjacent tiles take 1 less Wind and Flood damage, even from the Tsunami. Groves can burn.',
     lv: [{ title: 'Mangrove Grove', mat: 'light', hp: 3, power: 0, cost: 0, sprite: null }] },
 };
 const BUILDABLE = ['house','farm','substation','school','health','fire','cons'];
@@ -1055,45 +1058,45 @@ const MAT_LABEL = { light: 'Light', standard: 'Standard', concrete: 'Concrete' }
 /* ---------- Cards (Sections 11 & 13) ---------- */
 const CARDS = {
   fire1: { name: 'Cigar', fam: 'fire', lvl: 1, cp: 1, unlock: 1, kind: 'disaster', need: ['tile','adj'],
-    text: '1 FIRE DMG. SPREADS 1 TO AN ADJACENT TILE (YOUR CHOICE — NOT RANDOM). BURN 1.' },
+    text: 'Deal 1 Fire damage and Burn 1. The fire also spreads 1 damage to one adjacent tile you choose.' },
   fire2: { name: 'Candlelight', fam: 'fire', lvl: 2, cp: 4, unlock: 3, kind: 'disaster', need: ['tile'],
-    text: '2 FIRE DMG. SPREADS 1 TO ALL ADJACENT TILES. BURN 2.' },
+    text: 'Deal 2 Fire damage and Burn 2. The fire spreads 1 damage to every adjacent tile.' },
   fire3: { name: 'Wildfire', fam: 'fire', lvl: 3, cp: 7, unlock: 5, kind: 'disaster', need: ['tile'], exhaust: true,
-    text: '3 FIRE DMG TO TARGET, 2 TO ADJACENT TILES. BURN 3 (adjacent BURN 1).' },
+    text: 'Deal 3 Fire damage and Burn 3. Every adjacent tile takes 2 Fire damage and Burn 1.' },
   wind1: { name: 'Gentle Wind', fam: 'wind', lvl: 1, cp: 1, unlock: 1, kind: 'disaster', need: ['tile'], self: true,
-    text: '0 DMG. EXTINGUISHES CIGAR FIRES ON TARGET & ADJACENT. DRAW 1.' },
+    text: 'No damage. Puts out level-1 fires (Cigar) on the target and adjacent tiles. Draw 1 card.' },
   wind2: { name: 'Strong Gale', fam: 'wind', lvl: 2, cp: 2, unlock: 3, kind: 'disaster', need: ['tile','line'], self: true,
-    text: '1 WIND DMG TO A ROW OR COLUMN. EXTINGUISHES CIGAR AND CANDLELIGHT FIRES.' },
+    text: 'Deal 1 Wind damage to a whole row or column. Puts out level-1 and level-2 fires on that line.' },
   wind3: { name: 'Hurricane', fam: 'wind', lvl: 3, cp: 4, unlock: 5, kind: 'disaster', need: ['tile'], self: true, exhaust: true,
-    text: '2 WIND DMG TO TARGET AND ADJACENT TILES. EXTINGUISHES ALL FIRES. +1 FLOOD & FLOODS TARGET.' },
+    text: 'Deal 2 Wind damage to the target and every adjacent tile. The target also takes 1 Flood damage and is Flooded. Puts out all fires.' },
   rain1: { name: 'Drizzle', fam: 'rain', lvl: 1, cp: 1, unlock: 1, kind: 'disaster', need: ['tile'], self: true,
-    text: '1 FLOOD DMG. EXTINGUISHES CIGAR AND CANDLELIGHT FIRES.' },
+    text: 'Deal 1 Flood damage. Puts out level-1 and level-2 fires.' },
   rain2: { name: 'Rainfall', fam: 'rain', lvl: 2, cp: 2, unlock: 3, kind: 'disaster', need: ['tile'], self: true,
-    text: '2 FLOOD DMG. SPREADS 1 TO ADJACENT. EXTINGUISHES ALL FIRES.' },
+    text: 'Deal 2 Flood damage, plus 1 Flood damage to every adjacent tile. Puts out all fires.' },
   rain3: { name: 'Torrential Downpour', fam: 'rain', lvl: 3, cp: 4, unlock: 5, kind: 'disaster', need: ['tile'], self: true, exhaust: true,
-    text: '2 FLOOD DMG TO TARGET AND ADJACENT TILES. FLOODS THEM. EXTINGUISHES ALL FIRES.' },
+    text: 'Deal 2 Flood damage to the target and every adjacent tile, and Flood them all. Puts out all fires.' },
   quake1: { name: 'Magnitude 3', fam: 'quake', lvl: 1, cp: 2, unlock: 1, kind: 'disaster', need: ['tile','seg'],
-    text: '1 RAW DMG. BREAKS 1 WALL OR DRAIN ON THE TARGET’S EDGES (YOUR CHOICE).' },
+    text: 'Deal 1 Raw damage. Break 1 wall or drain on the target’s edges (your choice).' },
   quake2: { name: 'Magnitude 5', fam: 'quake', lvl: 2, cp: 4, unlock: 3, kind: 'disaster', need: ['tile'],
-    text: '2 RAW DMG, 1 TO ADJACENT. BREAKS ALL WALLS/DRAINS ON TARGET’S EDGES.' },
+    text: 'Deal 2 Raw damage, plus 1 to every adjacent tile. Break every wall and drain on the target’s edges.' },
   quake3: { name: 'Magnitude 8', fam: 'quake', lvl: 3, cp: 9, unlock: 6, kind: 'disaster', need: ['tile'], exhaust: true,
-    text: '3 RAW DMG, 2 ADJACENT, 1 TO ALL TILES. BREAKS NEARBY SEGMENTS. AFTERSHOCK.' },
+    text: 'Deal 3 Raw damage to the target, 2 to adjacent tiles and 1 to every other tile. Breaks nearby walls and drains. Aftershock: 1 more Raw damage to the target at the start of your next turn.' },
   signal: { name: 'Signal No. 5', fam: 'signal', lvl: 4, cp: 9, unlock: 8, last: 9, kind: 'disaster', need: [], exhaust: true,
-    text: 'GOD HELP US. COMMAND SLOT — ISSUED IN ROUND 8. LANDFALL NEXT TURN: 1 WIND + 1 FLOOD TO EVERYTHING, +1 WIND IN THE 2×2 EYE.' },
+    text: 'Command card: it joins your hand when Signal No. 5 unlocks. Declare it that round or the next. Landfall at the start of your next turn: 1 Wind + 1 Flood to every tile, +1 Wind in the 2×2 Eye you choose, and every wall and drain is damaged.' },
   vaccine: { name: 'Mass Vaccination', fam: 'buff', tag: 'Health', cp: 2, unlock: 1, kind: 'buff', need: [],
-    text: 'HEAL UP TO 3 INJURED NOW. HEALTH CENTER HEALS +1 AT YOUR NEXT UPKEEP.' },
+    text: 'Heal up to 3 injured residents now. Your Health Center heals 1 extra at your next upkeep.' },
   feeding: { name: 'Feeding Program', fam: 'buff', tag: 'Resilience', cp: 2, food: 2, unlock: 1, kind: 'buff', need: [],
-    text: 'COST 2 CP + 2 FOOD. PREVENT THE FIRST 3 INJURIES. VILLAGE CANNOT BE HUNGRY.' },
+    text: 'Costs 2 CP + 2 Food. Prevents the next 3 injuries until your next turn, and your barangay cannot go hungry.' },
   relief: { name: 'Relief Goods', fam: 'buff', tag: 'Repair', cp: 2, unlock: 1, kind: 'buff', need: [],
-    text: 'RESTORE 3 HP SPLIT AMONG BUILDINGS. REBUILD 1 DESTROYED BUILDING FOR 0 PONDO THIS TURN.' },
+    text: 'Restore 3 HP to your most damaged buildings. Rebuild 1 destroyed building for 0 Pondo this turn.' },
   drill: { name: 'Earthquake Drill', fam: 'buff', tag: 'Drill', cp: 2, unlock: 1, kind: 'buff', need: [],
-    text: 'QUAKES DEAL −1 PER TILE & INJURE NO ONE. OPPONENT’S QUAKES COST +1 CP. LASTS THROUGH THEIR NEXT TURN.' },
+    text: 'Until the end of your opponent’s next turn: earthquakes deal 1 less damage per tile and injure no one, and their earthquake cards cost 1 more CP.' },
   tree: { name: 'Tree Planting', fam: 'buff', tag: 'Grove', cp: 3, unlock: 1, kind: 'buff', need: ['open'],
-    text: 'PLANT A GROVE ON AN OPEN TILE: ADJACENT TILES TAKE −1 WIND & −1 FLOOD. MAX 2.' },
+    text: 'Plant a mangrove grove on an empty tile. Adjacent tiles take 1 less Wind and Flood damage. Max 2 groves.' },
   ayuda: { name: 'Ayuda', fam: 'buff', tag: 'Food', cp: 1, unlock: 1, kind: 'buff', need: [],
-    text: '+4 FOOD. IF FOOD NOW COVERS YOUR POPULATION, +1 RESIDENT.' },
+    text: 'Gain 4 Food. If your Food now covers your population, gain 1 resident.' },
   tesda: { name: 'TESDA', fam: 'buff', tag: 'Knowledge', cp: 2, unlock: 1, kind: 'buff', need: ['tesda'],
-    text: '+3 KP, OR UPGRADE 1 WORKER NOW FOR FREE (ENGINEER NEEDS DPWH).' },
+    text: 'Gain 3 KP, or train 1 worker for free (Engineers need the DPWH Office).' },
 };
 const FAM_COLOR = { fire: '#ff5a36', wind: '#3fd1c4', rain: '#4aa3ff', quake: '#d79a3c', signal: '#b04cff', buff: '#7ddc6b' };
 const FAM_ICON = { fire: '🔥', wind: '🌪️', rain: '🌧️', quake: '🌋', signal: '🌀', buff: '🛡️' };
@@ -1127,7 +1130,7 @@ function validateDeck(cards) {
 /* ---------- Layout presets for Blind Build (40 Pondo) ---------- */
 // rows: index = r*4+c ; edges: [c,r,side,type]
 const LAYOUTS = [
-  { name: 'GDD Sample', tiles: { 0:'farm', 2:'house', 4:'house', 5:'fire', 6:'house', 7:'health', 8:'cons', 9:'hall', 10:'substation' },
+  { name: 'Starter', tiles: { 0:'farm', 2:'house', 4:'house', 5:'fire', 6:'house', 7:'health', 8:'cons', 9:'hall', 10:'substation' },
     edges: [[0,0,'S','drain'],[2,1,'S','wall']] },
   { name: 'Fortress', tiles: { 0:'farm', 3:'farm', 5:'house', 6:'house', 9:'hall', 10:'fire', 13:'cons', 14:'substation', 12:'house' },
     edges: [[1,1,'E','wall'],[0,0,'E','drain']] },
@@ -1799,7 +1802,7 @@ const Eng = (() => {
 
   function canSeg(S, v, key, type) {
     if (v.edges[key]) return { ok: false, why: 'Edge occupied' };
-    if (segCount(v) >= segCap(v)) return { ok: false, why: 'Segment cap ' + segCap(v) + ' (Hall stage)' };
+    if (segCount(v) >= segCap(v)) return { ok: false, why: 'Wall & drain limit reached (' + segCap(v) + ') — upgrade your Hall for more' };
     if (v.pondo < 2) return { ok: false, why: 'Need 2 Pondo' };
     if (S.phase !== 'build' && v.actions <= 0) return { ok: false, why: 'Needs a worker action' };
     return { ok: true };
@@ -3453,10 +3456,10 @@ const Tutorial = (() => {
   const q = (id) => document.getElementById(id);
   const me = () => GAME.S && GAME.S.p[0];
   const STEPS = [
-    { title: 'Welcome, Kapitan!', text: 'SIGNAL 5 is a 1-vs-1 disaster drill. You defend your barangay and send disasters at your rival. After Round 10 a Tsunami hits both villages, and the highest <b>Village Integrity</b> wins.', target: null, next: 'LET’S GO' },
+    { title: 'Welcome, Kapitan!', text: 'SIGNAL 5 is a 1-vs-1 disaster drill. You defend your barangay and send disasters at your rival. After Round 10 a Tsunami hits both barangays, and the highest <b>Village Integrity</b> wins.', target: null, next: 'LET’S GO' },
     { title: 'Your barangay', text: 'This 4×4 grid is your island town. <b>Row 1</b> (the dashed cyan line) faces the sea, so the final Tsunami hits it hardest.', target: 'board', next: 'NEXT' },
     { title: 'Build the Barangay Hall', text: 'Tap any tile, then press <b>BUILD</b> on the Barangay Hall. Tip: keep it away from the coast.', target: 'board', until: () => !!Eng.hall(me()) },
-    { title: 'Fill your village', text: 'You need at least <b>8 buildings</b>. Tap <b>📋 SAMPLE</b> for a ready-made layout, or tap tiles to build your own.', target: '#btnCancel', until: () => Eng.buildingCount(me()) >= 8 },
+    { title: 'Fill your barangay', text: 'You need at least <b>8 buildings</b>. Tap <b>📋 STARTER</b> for a ready-made layout, or tap tiles to build your own.', target: '#btnCancel', until: () => Eng.buildingCount(me()) >= 8 },
     { title: 'Walls & drains', text: 'Firewalls and Drainage canals go on the <b>lines between tiles</b>. Tap 🧱 to show the lines, then tap one to build. Firewalls stop fire spreading; drains stop floods spreading.', target: '#tEdge', next: 'GOT IT' },
     { title: 'Ready!', text: 'Press <b>READY ✓</b>. Both layouts are revealed at the same time.', target: '#btnEnd', until: () => GAME.phase !== 'build' },
     { title: 'Scout your rival', text: 'This is the CPU’s barangay. Look for crowded houses (fire spreads between them) and tiles without drains. Press <b>CONTINUE</b> when you’re ready.', target: '#btnEnd', place: 'top', until: () => GAME.phase !== 'reveal' && GAME.phase !== 'waitbuild', wait: () => GAME.phase === 'reveal' },
@@ -3465,7 +3468,7 @@ const Tutorial = (() => {
     { title: 'Read any card', text: '<b>Hold a card for 2 seconds</b> (or hover over it with a mouse) to read exactly what it does.', target: '#hand', next: 'NEXT' },
     { title: 'Attack!', text: 'Tap a <b>Hazard</b> card, then tap a tile on the CPU’s island. The yellow numbers show the damage it will deal. Then press <b>PLAY CARD</b>.', target: '#hand', until: () => (GAME.playedCount || 0) >= 1 || GAME.phase !== 'action', soft: true },
     { title: 'Run your town', text: 'Tap your own buildings to repair, upgrade, evacuate or <b>hire workers</b>. Workers are residents with a job and cost 2 Pondo. Tap or hover the numbers at the top to learn what each one means.', target: '#res', next: 'NEXT' },
-    { title: 'End your turn', text: 'Press <b>END TURN</b> when you’re done. Burning tiles take damage, then you discard 1 card and draw back to 5.', target: '#btnEnd', until: () => GAME.phase !== 'action', wait: () => GAME.phase === 'action' },
+    { title: 'End your turn', text: 'Press <b>END TURN</b> when you’re done. Burning buildings take damage, then you discard 1 card and draw back to 5.', target: '#btnEnd', until: () => GAME.phase !== 'action', wait: () => GAME.phase === 'action' },
     { title: 'Turn order', text: 'This shows who plays this round. Player A goes first in Rounds 1–5; from Round 6 (halftime) Player B goes first.', target: '#order', next: 'NEXT' },
     { title: 'You’re ready!', text: 'Survive 10 rounds and the Tsunami with the highest Integrity %. Good luck, Kapitan! You can replay this tutorial from ⚙️ Settings.', target: '#integ', next: 'FINISH' },
   ];
@@ -3989,7 +3992,7 @@ function coinToss() {
 }
 /* ---------- PASS & PLAY (v2.1) ---------- */
 function hotseatMenu() {
-  modal('👥 Pass & Play', `<p>Two players share this device — no internet needed. Both barangays use the <b>Balanced</b> deck and the sample layout, and opening hands are dealt automatically.</p><p>Between turns, a cover screen hides your hand while you pass the device.</p>`,
+  modal('👥 Pass & Play', `<p>Two players share this device — no internet needed. Both barangays use the <b>Balanced</b> deck and the Starter layout, and opening hands are dealt automatically.</p><p>Between turns, a cover screen hides your hand while you pass the device.</p>`,
     [{ label: '⚡ QUICK · 6 rounds', cls: 'gold', fn: () => { closeModal(); hotseatToss(true); } }, { label: '🏆 FULL · 10 rounds', fn: () => { closeModal(); hotseatToss(false); } }, { label: 'Back', fn: () => { closeModal(); deckSelect(); } }]);
 }
 function hotseatToss(quick) {
@@ -4036,8 +4039,8 @@ async function quickSetup() {
   $('sub').classList.remove('hidden'); restoreActionButtons(); $('btnEnd').classList.add('hidden'); layoutInsets();
   GAME.busy = true; R.showLabels = false; $('tLabels').classList.remove('on');
   AI.preparedPlan(S, 0);
-  await banner('⚡ QUICK MATCH', 'Sample layouts are built · your opening hand is ready', '', 1700);
-  toast('⚡ Quick Match: your barangay uses the sample layout and the CPU built “' + esc(lay) + '”. Tap OPPONENT to scout it.', 'gold');
+  await banner('⚡ QUICK MATCH', 'Starter layouts are built · your opening hand is ready', '', 1700);
+  toast('⚡ Quick Match: both barangays use a ready-made layout. Tap OPPONENT to scout the CPU’s.', 'gold');
   GAME.busy = false; refreshHUD();
   startMatch();
 }
@@ -4119,8 +4122,8 @@ function finish() {
 function howTo(page = 0) {
   const P = [null,
     ['🔁 Each turn', `<p><b>Upkeep</b> runs by itself: firefighters put out fires, workers repair, health workers heal, then you collect Pondo, Food and KP.</p><p>You gain <b>Command Points (CP)</b>: 3 in Round 1, rising to 10. Spend them on cards. One unspent CP carries over.</p><p><b>Tap a card</b> → tap a target tile → check the live damage preview → <b>PLAY CARD</b>. Tap your own tiles to build, upgrade, repair, hire, train or evacuate (needs Pondo + a 🔨 worker action).</p><p><b>END TURN</b>: burning tiles take damage, then you discard 1 card and draw back to 5.</p><p>Player A moves first in Rounds 1–5. At the <b>halftime switch</b> (Round 6) the order flips and Player B moves first until the end.</p>`],
-    ['🔥 Spread & counters', `<p>Disasters spread to adjacent tiles exactly as the card says.</p><ul><li><b>Firewalls</b> block fire crossing a line. On the coast they act as a <b>Seawall</b> (−2 Tsunami).</li><li><b>Drainage</b> blocks flood crossing a line and gives −1 Flood to touching tiles (max −2). It also irrigates farms.</li><li><b>Open tiles are firebreaks</b> — they never burn or flood.</li><li><b>Earthquakes</b> deal Raw damage that ignores walls and materials and <b>breaks</b> wall/drain segments. Drill and Retrofit reduce it.</li><li><b>Concrete</b> resists fire and wind. <b>Nipa huts</b> on stilts shrug off floods but burn easily.</li><li>Fire Stations give −1 Fire to covered tiles. Groves give −1 Wind and −1 Flood to neighbours.</li></ul>`],
-    ['🌀 Signal No. 5 & the Tsunami', `<p>Every deck has one Signal No. 5. It waits in your <b>Command slot</b> and joins your hand at the start of Round 8. Declare it in Round 8 or 9 for 9 CP.</p><p>It lands at the start of your next turn: <b>1 Wind + 1 Flood</b> on every building, +1 Wind in the 2×2 Eye you choose. Your opponent always gets one full turn to evacuate, drain and plant trees.</p><p>After Round 10 a <b>Tsunami</b> hits both villages by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0.</p><p><b>Integrity %</b> = 70 × building HP ÷ max HP + 30 × healthy ÷ peak population. Highest wins. Drop your rival below 20% Integrity during the 10 rounds and they <b>Collapse</b> — an instant Knockout. Ties go to a Sudden-Death Tsunami.</p>`],
+    ['🔥 Spread & counters', `<p>Hazards spread to adjacent tiles exactly as the card says.</p><ul><li><b>Firewalls</b> block fire crossing a line. On the coast they act as a <b>Seawall</b> (−2 Tsunami).</li><li><b>Drainage</b> blocks flood crossing a line and gives −1 Flood to touching tiles (max −2). It also irrigates farms.</li><li><b>Open tiles are firebreaks</b> — they never burn or flood.</li><li><b>Earthquakes</b> deal Raw damage that ignores walls and materials and <b>breaks</b> walls and drains. Drill and Retrofit reduce it.</li><li><b>Concrete</b> resists fire and wind. <b>Nipa huts</b> on stilts shrug off floods but burn easily.</li><li>Fire Stations give −1 Fire to covered tiles. Groves give −1 Wind and −1 Flood to neighbours.</li></ul>`],
+    ['🌀 Signal No. 5 & the Tsunami', `<p>Every deck has one Signal No. 5. It waits in your <b>Command slot</b> and joins your hand at the start of Round 8. Declare it in Round 8 or 9 for 9 CP.</p><p>It lands at the start of your next turn: <b>1 Wind + 1 Flood</b> on every building, +1 Wind in the 2×2 Eye you choose. Your opponent always gets one full turn to evacuate, drain and plant trees.</p><p>After Round 10 a <b>Tsunami</b> hits both barangays by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0.</p><p><b>Integrity %</b> = 70 × building HP ÷ max HP + 30 × healthy ÷ peak population. Highest wins. Drop your rival below 20% Integrity during the 10 rounds and they <b>Collapse</b> — an instant Knockout. Ties go to a Sudden-Death Tsunami.</p>`],
     ['🎮 Controls', `<ul><li><b>Drag</b> to pan when zoomed in · <b>pinch</b> or scroll to zoom · <b>double-tap</b> to reset the view.</li><li><b>🏡 My Barangay / ⚔️ Opponent</b> tabs switch villages.</li><li>🧱 opens <b>Walls & Drainage</b> — then tap a line between two tiles.</li><li>🗺️ shows tile names (A1–D4) · 📜 opens the match log · 🎯 recentres.</li><li>Tap the <b>Next Draw</b> panel to see the card you will draw next (Weather Forecast).</li><li>Tap any card to read it in full.</li></ul>`],
   ];
   const dots = [0, 1, 2, 3, 4].map(i => `<button class="hw-dot ${i === page ? 'on' : ''}" data-p="${i}" style="${scR(748 + i * 37, 878, 774 + i * 37, 904)}" aria-label="Page ${i + 1}"></button>`).join('');
@@ -4133,7 +4136,7 @@ function howTo(page = 0) {
 
 /* ---------- RULEBOOK ---------- */
 function rulebook(tab = 'bld', bsel = 'hall') {
-  const TABS = [['bld', 'Buildings', 38, 324, 'rb_bld'], ['dis', 'Disasters', 332, 578, 'rb_dis'], ['buff', 'Preparedness', 586, 842, 'rb_buff'], ['dmg', 'Damage', 850, 1100, 'rb_dmg'], ['turn', 'Turn', 1108, 1338, 'rb_turn'], ['score', 'Scoring', 1346, 1632, 'rb_score']];
+  const TABS = [['bld', 'Buildings', 38, 324, 'rb_bld'], ['dis', 'Hazards', 332, 578, 'rb_dis'], ['buff', 'Preparedness', 586, 842, 'rb_buff'], ['dmg', 'Damage', 850, 1100, 'rb_dmg'], ['turn', 'Turn', 1108, 1338, 'rb_turn'], ['score', 'Scoring', 1346, 1632, 'rb_score']];
   const tabs = `${scCv([36, 164, 1636, 242])}<div class="sc-tabs rb">${TABS.map(([k, n, a, b, ic]) => `<button class="${k === tab ? 'on' : ''}" data-t="${k}" style="${scR(a, 170, b, 238)}"><img src="${A(ic)}" alt="">${n}</button>`).join('')}</div>`;
   let body = '';
   if (tab === 'bld') {
@@ -4422,9 +4425,9 @@ function enterBuild() {
   setStatus('🏗️', 'BLIND BUILD', '40 Pondo to spend. Row 1 faces the sea.', ST_LIST.build);
   setPhase('🏗️ BLIND BUILD', 'Tap a tile to build. Hall first!');
   $('btnEnd').textContent = 'READY ✓'; $('btnEnd').className = 'btn green';
-  $('btnCancel').classList.remove('hidden'); $('btnCancel').textContent = '📋 SAMPLE';
+  $('btnCancel').classList.remove('hidden'); $('btnCancel').textContent = '📋 STARTER';
   $('btnPlay').classList.remove('hidden'); $('btnPlay').textContent = '🗑 CLEAR'; $('btnPlay').className = 'btn red'; $('btnPlay').disabled = false;
-  $('btnCancel').onclick = () => { Eng.applyLayout(S, S.p[0], LAYOUTS[0]); R.sync(0, S); SFX.play('build'); refreshHUD(); toast('Loaded the GDD sample layout (40 Pondo)', 'gold'); };
+  $('btnCancel').onclick = () => { Eng.applyLayout(S, S.p[0], LAYOUTS[0]); R.sync(0, S); SFX.play('build'); refreshHUD(); toast('📋 Starter layout placed. Leftover Pondo carries into Round 1.', 'gold'); };
   $('btnPlay').onclick = () => { const v = S.p[0]; v.tiles = Array(16).fill(null); v.edges = {}; v.pondo = 40; v.wander = 6; v.wInj = []; Eng.recomputePower(v); R.sync(0, S); refreshHUD(); closeSheet(); SFX.play('click'); };
   $('sub').classList.add('hidden');
   refreshHUD(); layoutInsets();
@@ -4432,7 +4435,7 @@ function enterBuild() {
 async function finishBuild() {
   const S = GAME.S, v = S.p[0];
   if (!Eng.hall(v)) { toast('Place your Barangay Hall first', 'bad'); SFX.play('error'); return; }
-  if (Eng.buildingCount(v) < 8) { toast('Minimum 8 buildings (you have ' + Eng.buildingCount(v) + ')', 'bad'); SFX.play('error'); return; }
+  if (Eng.buildingCount(v) < 8) { toast('Build at least 8 buildings first (you have ' + Eng.buildingCount(v) + ')', 'bad'); SFX.play('error'); return; }
   closeSheet(); R.edgeMode = false; $('tEdge').classList.remove('on');
   GAME.busy = true; let lay = '';
   if (online()) {
@@ -4526,15 +4529,15 @@ function onInfo(e) {
   switch (e.t) {
     case 'signalDeclared': R.danger = 0.8; SFX.play('siren'); SFX.voice('Signal Number 5! Lumikas na!'); s5Alert(e.pi === 0 ? 'YOU DECLARED' : OPP().toUpperCase() + ' DECLARED', e.pi === 0 ? 'Landfall at the start of your next turn' : 'Landfall next turn — EVACUATE & DRAIN!'); if (0) banner('SIGNAL NO. 5 RAISED', e.pi === 0 ? 'Landfall at the start of your next turn' : 'Landfall at ' + OPP() + '’s next turn — PREPARE!', 'purple', 2200); setTimeout(() => { R.danger = e.pi === 0 ? 0.25 : 0.5; }, 2400); refreshHUD(); break;
     case 'draw': if (e.pi === 0) toast('🌬️ Drew 1 card', 'good'); break;
-    case 'commandSignal': toast(e.pi === 0 ? '🌀 Signal No. 5 has moved from your Command slot into your hand — declare it in Round 8 or 9' : '🌀 ' + OPP() + ' now holds Signal No. 5 (Command slot)', e.pi === 0 ? 'gold' : ''); break;
-    case 'signalExpired': if (e.pi === 0) toast('🌀 Your unused Signal No. 5 expired after Round 9', ''); break;
+    case 'commandSignal': toast(e.pi === 0 ? '🌀 Signal No. 5 is now in your hand — declare it this round or next' : '🌀 ' + OPP() + ' now holds Signal No. 5', e.pi === 0 ? 'gold' : ''); break;
+    case 'signalExpired': if (e.pi === 0) toast('🌀 Your Signal No. 5 expired unused', ''); break;
     case 'buff': toast((e.pi === 0 ? '🛡️ ' : '🛡️ ' + OPP() + ': ') + e.msg, e.pi === 0 ? 'good' : ''); SFX.play('heal'); break;
     case 'medal': SFX.play('medal'); toast((e.vi === 0 ? '🏅 You earned ' : '🏅 ' + OPP() + ' earned ') + e.medal.toUpperCase() + ' medal', e.vi === 0 ? 'gold' : 'bad'); break;
     case 'aftershockSet': toast('🌋 Aftershock will hit at the start of ' + (e.pi === 0 ? 'your' : OPP() + '’s') + ' next turn', 'gold'); break;
     case 'income': if (e.pi === 0) toast(`💰 ${fmt(e.pondo)} Pondo · 🌾 ${fmt(e.food)} Food${e.kp ? ' · 📘 ' + fmt(e.kp) + ' KP' : ''}`, 'good'); break;
-    case 'grow': if (e.pi === 0) toast('👶 +1 resident (Food ≥ 4)', 'good'); break;
-    case 'hungry': toast(e.pi === 0 ? '🍚 Your village is HUNGRY — workers skip actions' : '🍚 ' + OPP() + '’s village is hungry', e.pi === 0 ? 'bad' : ''); break;
-    case 'relocate': toast((e.pi === 0 ? '🚚 ' : '🚚 ' + OPP() + ': ') + e.n + ' injured resident(s) relocated', e.pi === 0 ? 'bad' : ''); break;
+    case 'grow': if (e.pi === 0) toast('👶 New resident! (4+ Food left over)', 'good'); break;
+    case 'hungry': toast(e.pi === 0 ? '🍚 Your barangay is hungry — workers and health staff skip their jobs this upkeep' : '🍚 ' + OPP() + '’s barangay is hungry', e.pi === 0 ? 'bad' : ''); break;
+    case 'relocate': toast((e.pi === 0 ? '🚚 ' : '🚚 ' + OPP() + ': ') + e.n + (e.n === 1 ? ' injured resident went untreated and left the barangay' : ' injured residents went untreated and left the barangay'), e.pi === 0 ? 'bad' : ''); break;
     case 'toast': toast(e.text, e.kind); break;
   }
 }
@@ -4553,7 +4556,7 @@ async function takeTurn(pi) {
     if (mine) { eye = await chooseEye(); if (online()) NET.send('eye', { top: eye }); }
     else if (online()) { setPhase('🌀 LANDFALL', OPP() + ' is choosing the Eye…'); eye = (await NET.expect('eye')).d.top; }
     else eye = AI.bestEye(S, pi);
-    await banner('LANDFALL!', 'Signal No. 5 — God help us.', 'purple', 1700);
+    await banner('LANDFALL!', 'Signal No. 5 makes landfall — brace for impact!', 'purple', 1700);
     const ev = Eng.landfall(S, pi, eye); await FX.play(ev, S, { vi: 1 - pi, onInfo }); syncAll();
     if (S.knockout != null) return;
   }
@@ -4567,13 +4570,13 @@ async function takeTurn(pi) {
   GAME.phase = 'wait'; GAME.busy = true; cancelSel(true); closeSheet(); R.edgeMode = false; $('tEdge').classList.remove('on');
   await R.setView(pi); updateTabs();
   const e2 = Eng.endTurn(S, pi);
-  if (e2.some(e => e.t === 'burnTick' || e.t === 'repair')) { setPhase('🔥 BURN STEP', 'Burning tiles take 1 Fire damage, then cool by one level'); await FX.play(e2, S, { vi: pi, onInfo, tail: 200 }); }
+  if (e2.some(e => e.t === 'burnTick' || e.t === 'repair')) { setPhase('🔥 BURN STEP', 'Each burning building takes 1 Fire damage, then its fire weakens by 1.'); await FX.play(e2, S, { vi: pi, onInfo, tail: 200 }); }
   syncAll(); if (S.knockout != null) return;
   // refresh: discard 1, draw to 5
   if (v.hand.length) {
     let d; const fp = online() ? Eng.fingerprint(S, GAME.roles) : null;
     if (mine) { d = await chooseDiscard(); if (online()) NET.send('discard', { d, id: v.hand[d], fp, r: S.round }); }
-    else if (online()) { setPhase('🗑 REFRESH', OPP() + ' is discarding…'); const m = await NET.expect('discard'); d = m.d.d; if (m.d.id && CARDS[m.d.id] && v.hand[d] != null) { v.hand[d] = m.d.id; GAME.audit.push(['D', m.d.id]); } if (m.d.fp !== fp) { GAME.desync = (GAME.desync || 0) + 1; console.warn('desync', m.d.fp, fp); if (GAME.desync === 1) toast('⚠️ Game states differ from ' + OPP() + ' (desync). Keep playing — report this to Team Pura.', 'bad'); } }
+    else if (online()) { setPhase('🗑 DISCARD', OPP() + ' is discarding…'); const m = await NET.expect('discard'); d = m.d.d; if (m.d.id && CARDS[m.d.id] && v.hand[d] != null) { v.hand[d] = m.d.id; GAME.audit.push(['D', m.d.id]); } if (m.d.fp !== fp) { GAME.desync = (GAME.desync || 0) + 1; console.warn('desync', m.d.fp, fp); if (GAME.desync === 1) toast('⚠️ Game states differ from ' + OPP() + ' (desync). Keep playing — report this to Team Pura.', 'bad'); } }
     else d = AI.chooseDiscard(S, pi);
     if (v.hand[d] === 'signal') d = v.hand.findIndex(x => x !== 'signal');
     if (d < 0) d = null;
@@ -4587,7 +4590,7 @@ async function takeTurn(pi) {
 function humanTurn() {
   GAME.phase = 'action'; GAME.busy = false; const S = GAME.S, v = S.p[0]; GAME.undo = []; setTimeout(updateUndoBtn, 0);
   setStatus('⚡', 'ACTION PHASE', `${v.cp} CP + ${v.actions} worker action${v.actions === 1 ? '' : 's'}`, ST_LIST.action);
-  setPhase('⚠ YOUR TURN', 'Tap a card to attack or prepare — or tap your tiles to build.');
+  setPhase('▶ YOUR TURN', 'Play a card, or tap your own tiles to build.');
   $('btnEnd').classList.remove('hidden'); $('btnEnd').classList.add('pulse'); renderHand(); refreshHUD();
   if (online()) startTurnTimer();
   if (S.p[1].signalPending) toast('🌀 Signal No. 5 lands at the start of ' + OPP() + '’s next turn — evacuate, drain, plant trees!', 'bad');
@@ -4605,16 +4608,16 @@ function onEndBtn() {
 }
 function chooseDiscard() {
   GAME.phase = 'discard'; GAME.discardSel = -1; GAME.busy = false;
-  setPhase('🗑 REFRESH', 'Discard exactly 1 card, then draw back to 5.');
+  setPhase('🗑 DISCARD', 'Pick 1 card to discard. You draw back to 5.');
   renderHand(); $('btnPlay').classList.remove('hidden'); $('btnPlay').textContent = 'DISCARD ✓'; $('btnPlay').disabled = true; $('btnEnd').classList.add('hidden');
-  if (online()) { clearTimeout(GAME.discardTimer); GAME.discardTimer = setTimeout(() => { if (GAME.phase === 'discard') { const H = GAME.S.p[0].hand; let k = H.length - 1; if (H[k] === 'signal') k--; GAME.discardSel = Math.max(0, k); toast('⏱ Time up — discarded the right-most card', 'bad'); onPlayBtn(); } }, 15000); }
+  if (online()) { clearTimeout(GAME.discardTimer); GAME.discardTimer = setTimeout(() => { if (GAME.phase === 'discard') { const H = GAME.S.p[0].hand; let k = H.length - 1; if (H[k] === 'signal') k--; GAME.discardSel = Math.max(0, k); toast('⏱ Time’s up — your right-most card was discarded', 'bad'); onPlayBtn(); } }, 15000); }
   return new Promise(res => { GAME.discardResolve = res; });
 }
 function chooseEye() {
   GAME.phase = 'eye'; GAME.eyeSel = -1; GAME.busy = false;
   return new Promise(async res => {
     await R.setView(1); updateTabs(); R.showLabels = true;
-    setPhase('🌀 LANDFALL', 'Tap the opponent’s map to place the 2×2 EYE (+1 Wind).');
+    setPhase('🌀 LANDFALL', 'Tap your opponent’s island to place the 2×2 Eye (+1 Wind inside it).');
     $('btnPlay').classList.remove('hidden'); $('btnPlay').textContent = '🌀 UNLEASH'; $('btnPlay').disabled = true; $('btnEnd').classList.add('hidden');
     GAME.eyeResolve = (v) => { R.showLabels = false; R.highlights = null; $('btnPlay').classList.add('hidden'); res(v); };
   });
@@ -4678,7 +4681,7 @@ async function execAct(pi, act, who) {
   const res = ecoApply(S, v, act);
   if (!res || !res.ok) return res || { ok: false };
   const i = act.i != null ? act.i : act.fn === 'stageUp' ? v.tiles.findIndex(b => b && b.type === 'hall') : null;
-  const label = { build: '🏗️ Built ' + (act.type && BLD[act.type].name), upgrade: '⬆️ Upgraded', stageUp: '🏛️ HALL STAGE UP!', repairPondo: '🔧 Repaired', repairWorker: '🔧 Repaired', rebuild: '🏗️ Rebuilt', addSeg: act.t === 'wall' ? '🧱 Firewall' : '🌊 Drainage', repairSeg: '🔧 Segment repaired', hire: '👷 Hired', train: '🎓 Trained', evacuate: '🚨 Evacuated', retrofit: '🔩 Retrofitted' }[act.fn] || act.fn;
+  const label = { build: '🏗️ Built ' + (act.type && BLD[act.type].name), upgrade: '⬆️ Upgraded', stageUp: '🏛️ HALL STAGE UP!', repairPondo: '🔧 Repaired', repairWorker: '🔧 Repaired', rebuild: '🏗️ Rebuilt', addSeg: act.t === 'wall' ? '🧱 Firewall' : '🌊 Drainage', repairSeg: '🔧 Wall/drain repaired', hire: '👷 Hired', train: '🎓 Trained', evacuate: '🚨 Evacuated', retrofit: '🔩 Retrofitted' }[act.fn] || act.fn;
   R.sync(pi, S);
   if (i != null && i >= 0) { const [x, y] = R.TC(i); R.floater(x, y - 120, label, '#ffe9a0', { size: 22 }); R.burst(x, y - 40, 12, { color: '#ffe9a0', speed: 80, up: 60, life: 0.8, size: 3 }); }
   else if (act.key) { const g = R.edgeGeom(act.key); R.floater(g.mid[0], g.mid[1] - 80, label, '#ffe9a0', { size: 22 }); }
@@ -4688,7 +4691,7 @@ async function execAct(pi, act, who) {
 }
 async function cpuTurn(pi) {
   const S = GAME.S; const memo = {}; let fails = 0;
-  setStatus('🤖', 'CPU TURN', 'The opposing Kapitan is acting as hazard controller for your barangay.');
+  setStatus('🤖', 'CPU TURN', 'The CPU is sending hazards at your barangay. Watch how each one resolves.');
   setPhase('🤖 CPU TURN', 'Watch closely — every effect resolves in a fixed order.');
   $('btnEnd').classList.add('hidden');
   await sleep(400);
@@ -4703,7 +4706,7 @@ async function cpuTurn(pi) {
 }
 async function remoteTurn(pi) {
   const S = GAME.S;
-  setStatus('🌐', OPP().toUpperCase() + '’S TURN', OPP() + ' is acting as hazard controller for your barangay. You can look around while you wait.');
+  setStatus('🌐', OPP().toUpperCase() + '’S TURN', OPP() + ' is sending hazards at your barangay. You can look around while you wait.');
   $('btnEnd').classList.add('hidden');
   GAME.rUndo = [];
   while (true) {
@@ -4731,10 +4734,10 @@ function startTurnTimer() {
   GAME.turnTimer = setInterval(() => {
     let left = Math.ceil((GAME.turnEnd - Date.now()) / 1000);
     if (GAME.phase !== 'action') return;
-    if (left <= 0 && !GAME.inBank && (GAME.bank || 0) > 0) { GAME.inBank = true; GAME.turnEnd = Date.now() + GAME.bank * 1000; left = GAME.bank; toast('⏱ Turn time used — now spending your ' + GAME.bank + ' s time bank', 'bad'); }
-    if (GAME.inBank && !GAME.sel) setPhase('⏱ BANK ' + left + 's', 'Time bank running — End Turn soon!');
-    else if (left <= 20 && left > 0 && !GAME.sel) setPhase('⏱ ' + left + 's', 'Turn timer running out — End Turn soon! (bank: ' + (GAME.bank || 0) + ' s)');
-    if (left <= 0 && !GAME.busy) { GAME.bank = 0; toast('⏱ Time up — turn ended automatically', 'bad'); cancelSel(true); closeModal(); const r = GAME.turnResolve; GAME.turnResolve = null; stopTurnTimer(); NET.send('end'); $('btnEnd').classList.add('hidden'); r && r(); }
+    if (left <= 0 && !GAME.inBank && (GAME.bank || 0) > 0) { GAME.inBank = true; GAME.turnEnd = Date.now() + GAME.bank * 1000; left = GAME.bank; toast('⏱ Turn timer ran out — using your ' + GAME.bank + 's time bank', 'bad'); }
+    if (GAME.inBank && !GAME.sel) setPhase('⏱ BANK ' + left + 's', 'Time bank running — end your turn soon!');
+    else if (left <= 20 && left > 0 && !GAME.sel) setPhase('⏱ ' + left + 's', 'Turn timer running out — end your turn soon (bank: ' + (GAME.bank || 0) + 's)');
+    if (left <= 0 && !GAME.busy) { GAME.bank = 0; toast('⏱ Time’s up — your turn ended automatically', 'bad'); cancelSel(true); closeModal(); const r = GAME.turnResolve; GAME.turnResolve = null; stopTurnTimer(); NET.send('end'); $('btnEnd').classList.add('hidden'); r && r(); }
   }, 1000);
 }
 function stopTurnTimer() { if (GAME.inBank && GAME.turnEnd) GAME.bank = Math.max(0, Math.ceil((GAME.turnEnd - Date.now()) / 1000)); GAME.inBank = false; clearInterval(GAME.turnTimer); GAME.turnTimer = null; }
@@ -4743,10 +4746,10 @@ async function tsunamiPhase() {
   const S = GAME.S; GAME.phase = 'wait'; GAME.busy = true; S.phase = 'tsunami';
   try { SFX.danger(false); SFX.storm(1); } catch (e) {}
   await tsunamiWave();
-  await banner('TSUNAMI', 'The league’s final evaluation — it hits both villages', 'blue', 1600);
+  await banner('TSUNAMI', 'The league’s final test — it hits both barangays', 'blue', 1600);
   for (const vi of [0, 1]) { const ev = Eng.tsunami(S, vi); await FX.play(ev, S, { vi, onInfo, tail: 700 }); syncAll(); }
   if (S.knockout == null && Eng.finalResult(S).winner === -1) {
-    S.suddenDeath = true; await banner('SUDDEN DEATH', 'Dead even — a second, stronger Tsunami hits both villages', 'blue', 2200);
+    S.suddenDeath = true; await banner('SUDDEN DEATH', 'Dead even — a second, stronger Tsunami hits both barangays', 'blue', 2200);
     for (const vi of [0, 1]) { const ev = Eng.tsunami(S, vi, [4, 3, 2, 1]); await FX.play(ev, S, { vi, onInfo, tail: 700 }); syncAll(); }
   }
 }
@@ -4798,11 +4801,11 @@ function refreshHUD() {
   const inj = Eng.injuredTotal(v);
   const chips = [
     ['pondo', 'ui_pondo', 'PONDO', v.pondo, false],
-    ['power', 'ui_energy', 'ENERGY', `${v.power.demand}/${v.power.supply}`, v.power.demand > v.power.supply || v.tiles.some(b => b && b.off)],
+    ['power', 'ui_energy', 'POWER', `${v.power.demand}/${v.power.supply}`, v.power.demand > v.power.supply || v.tiles.some(b => b && b.off)],
     ['food', 'ui_food', 'FOOD', v.food, v.food < need],
     ['res', 'ui_people', 'PEOPLE', Eng.healthyPop(v) + (inj ? `<small> +${inj}</small>` : ''), false],
     ['kp', 'ui_rules', 'KP', v.kp, false],
-    ['drrm', 'ui_shield', 'DRRM', S.phase === 'build' ? st : `${st - v.evacAssigned}/${st}`, false],
+    ['drrm', 'ui_shield', 'OFFICERS', S.phase === 'build' ? st : `${st - v.evacAssigned}/${st}`, false],
     ['bld', 'ui_build', 'BUILDINGS', `${Eng.buildingCount(v)}/16`, false],
   ];
   if (!$('res').children.length) $('res').innerHTML = chips.map(c => `<div class="chip" id="ch_${c[0]}" data-tip="${c[0]}"><span class="ic"><img src="${ASSETS[c[1]] || A(c[1])}" alt=""></span><span class="tx"><span class="lb">${c[2]}</span><span class="v"></span></span></div>`).join('');
@@ -4831,12 +4834,13 @@ function refreshHUD() {
   updateHandState();
 }
 /* ---------------- hand ---------------- */
-function cardBlurb(id) { const c = CARDS[id]; const t = c.text.replace(/\s+/g, ' ').trim(); const first = t.split('. ')[0]; return (c.kind === 'disaster' && c.fam !== 'signal' ? 'LV ' + c.lvl + ' · ' : '') + first.replace(/\.$/, '') + '.'; }
+const CARD_SHORT = { fire1: '1 Fire dmg + spread', fire2: '2 Fire dmg + spread', fire3: '3 Fire dmg + spread', wind1: 'Puts out small fires', wind2: '1 Wind dmg to a line', wind3: '2 Wind dmg + area', rain1: '1 Flood dmg', rain2: '2 Flood dmg + spread', rain3: '2 Flood dmg + area', quake1: '1 Raw dmg + break a wall', quake2: '2 Raw dmg + area', quake3: 'Raw dmg to the whole island', signal: 'Landfall on every tile', vaccine: 'Heal 3 injured', feeding: 'Prevent 3 injuries', relief: 'Repair 3 HP + free rebuild', drill: 'Weaken earthquakes', tree: 'Plant a mangrove grove', ayuda: '+4 Food', tesda: '+3 KP or train a worker' };
+function cardBlurb(id) { const c = CARDS[id]; const t = CARD_SHORT[id] || c.text.split('. ')[0]; return (c.kind === 'disaster' && c.fam !== 'signal' ? 'LV ' + c.lvl + ' · ' : '') + t; }
 function cardEl(id) {
   const S = GAME.S; const c = CARDS[id]; const d = document.createElement('div'); d.className = 'card'; d.dataset.id = id;
   d.classList.add('f-' + c.fam);
   const cost = S ? Eng.cardCost(S, 0, id) : c.cp;
-  d.innerHTML = `<div class="cf art"><img src="${ASSETS['card_' + id]}" alt="${esc(c.name)}" draggable="false"><i class="gloss"></i></div><span class="ktag ${c.kind === 'buff' ? 'buff' : 'haz'}">${c.kind === 'buff' ? '🛡 BUFF' : '⚠ HAZARD'}</span><div class="cost art ${cost !== PRINTED_COST[id] && id !== 'feeding' ? 'show' : ''}" style="--bb:${BADGE_BG[c.fam === 'buff' ? id : c.fam]}">${cost}</div>`;
+  d.innerHTML = `<div class="cf art"><img src="${ASSETS['card_' + id]}" alt="${esc(c.name)}" draggable="false"><i class="gloss"></i></div><span class="ktag ${c.kind === 'buff' ? 'buff' : 'haz'}">${c.kind === 'buff' ? '🛡 PREPARE' : '⚠ HAZARD'}</span><div class="cost art ${cost !== PRINTED_COST[id] && id !== 'feeding' ? 'show' : ''}" style="--bb:${BADGE_BG[c.fam === 'buff' ? id : c.fam]}">${cost}</div>`;
   return d;
 }
 function renderHand(initial, keepFirst) {
@@ -4893,7 +4897,7 @@ function cancelSel(silent) {
   if (!GAME.inspectHover) closeInspect();
   GAME.sel = null; R.highlights = null; R.preview = null; R.selected = -1; R.selEdge = null; R.edgeCands = null; R.edgeMode = $('tEdge').classList.contains('on');
   $('btnCancel').classList.add('hidden'); $('btnPlay').classList.add('hidden'); $('segbar').classList.add('hidden'); $('phase').classList.remove('sel');
-  if (GAME.phase === 'action') { setPhase('⚠ YOUR TURN', 'Tap a card to attack or prepare — or tap your tiles to build.'); if (!silent) $('btnEnd').classList.remove('hidden'); }
+  if (GAME.phase === 'action') { setPhase('▶ YOUR TURN', 'Play a card, or tap your own tiles to build.'); if (!silent) $('btnEnd').classList.remove('hidden'); }
   updateHandState(); updateUndoBtn();
 }
 async function updateTargeting() {
@@ -4935,7 +4939,7 @@ function targetTap(i) {
   const sel = GAME.sel; const c = CARDS[sel.id];
   if (sel.step === 'adj') { if (sel.valid.includes(i)) { sel.tg.adj = i; updateTargeting(); } else if (i !== sel.tg.idx) { sel.tg = { vi: sel.tg.vi, idx: i }; updateTargeting(); } return; }
   if (!(c.need.includes('tile') || c.need.includes('open'))) return;
-  if (c.need.includes('open') && GAME.S.p[sel.tg.vi].tiles[i]) { SFX.play('error'); toast('Choose an OPEN tile', 'bad'); return; }
+  if (c.need.includes('open') && GAME.S.p[sel.tg.vi].tiles[i]) { SFX.play('error'); toast('Pick an empty tile', 'bad'); return; }
   if (R.view !== sel.tg.vi) return;
   sel.tg = { vi: sel.tg.vi, idx: i, line: sel.tg.line }; updateTargeting();
 }
@@ -4977,7 +4981,7 @@ async function playSelected() {
   log(`You played ${c.name}` + (tg.idx != null ? ' on ' + (tg.vi === 0 ? 'your ' : 'CPU ') + tileName(tg.idx) : ''));
   await FX.play(r.ev, S, { vi: c.kind === 'buff' ? 0 : tg.vi, onInfo, noView: c.kind === 'buff' && tg.idx == null });
   syncAll(); renderHand(); GAME.busy = false;
-  setPhase('⚠ YOUR TURN', 'Tap a card to attack or prepare — or tap your tiles to build.'); if (GAME.phase === 'action') $('btnEnd').classList.remove('hidden');
+  setPhase('▶ YOUR TURN', 'Play a card, or tap your own tiles to build.'); if (GAME.phase === 'action') $('btnEnd').classList.remove('hidden');
   GAME.playedCount = (GAME.playedCount || 0) + 1;
   if (S.knockout != null && GAME.turnResolve) { const res = GAME.turnResolve; GAME.turnResolve = null; res(); }
 }
@@ -5019,7 +5023,7 @@ function modLine(type, lv, b) {
 function statLines(type, lv) {
   const d = BLD[type].lv[lv]; const L = [];
   L.push(['HP', d.hp]);
-  if (type === 'hall') { L.push(['Pondo / upkeep', d.pondo], ['Shelter', d.shelter], ['DRRM Officers', d.officers], ['Power', '+' + d.gen + ' generator'], ['Segment cap', d.cap]); }
+  if (type === 'hall') { L.push(['Pondo / upkeep', d.pondo], ['Shelter', d.shelter], ['DRRM Officers', d.officers], ['Power', '+' + d.gen + ' generator'], ['Wall & drain limit', d.cap]); }
   if (d.res) L.push(['Residents', d.res]);
   if (d.slots) L.push([BLD[type].worker + ' slots', d.slots]);
   if (d.food) L.push(['Food / upkeep', d.food + ' (+1 irrigated)']);
@@ -5036,6 +5040,7 @@ function buildReason(S, v, type, i) {
   return Eng.canBuild(S, v, type, i);
 }
 function openTile(i) {
+  if (!GAME.sel) { GAME.inspectHover = false; try { closeInspect(); } catch (e) {} }
   const S = GAME.S; const vi = R.view; const v = S.p[vi]; const b = v.tiles[i]; R.selected = i;
   const own = vi === 0; const canAct = own && canEditOwn() && (GAME.phase === 'build' || S.cur === 0);
   const sub = (own ? 'YOUR BARANGAY · ' : 'CPU BARANGAY · ') + 'TILE ' + tileName(i) + (Math.floor(i / 4) === 0 ? ' · COAST' : '');
@@ -5113,7 +5118,7 @@ function showBuildingPanel(i) {
   } else if (own && GAME.phase !== 'build') html += `<p class="desc">⏳ You can act on buildings during your Action phase.</p>`;
   const titleTxt = `${BLD[b.type].icon} ${b.type === 'hall' ? d.title : d.title} <span style="font-size:13px;color:var(--gold)">L${b.lv + 1}</span>`;
   openSheet(sub, titleTxt, html);
-  $('shBody').querySelectorAll('.slot.empty').forEach(el => el.onclick = () => { const h = $('aHire'); if (h) h.click(); else toast('Hire workers during your turn (2 Pondo each)', 'gold'); });
+  $('shBody').querySelectorAll('.slot.empty').forEach(el => el.onclick = () => { const h = $('aHire'); if (h) h.click(); else toast('You can hire workers during your turn (2 Pondo each)', 'gold'); });
   ids.forEach(([id, fn, snd]) => { const el = $(id); if (!el) return; el.onclick = () => { const r = fn(); if (!r || !r.ok) { SFX.play('error'); r && r.why && toast(r.why, 'bad'); return; } SFX.play(snd); R.sync(0, S); const [x, y] = R.TC(i); if (snd === 'heal') R.floater(x, y - 110, '🔧 Repaired', '#7dff8a', { size: 20 }); else R.burst(x, y - 30, 16, { color: '#ffe9a0', speed: 100, up: 60, life: 0.7, size: 3 }); refreshHUD(); if (GAME.S.p[0].tiles[i]) showBuildingPanel(i); else closeSheet(); }; });
 }
 function edgeLabel(key) {
@@ -5133,7 +5138,7 @@ function openEdgeHelp() {
 function openEdge(key) {
   const S = GAME.S, v = S.p[0]; const e = v.edges[key]; R.selEdge = key; const coastal = Eng.isCoastal(key);
   const blind = GAME.phase === 'build';
-  let html = `<div class="wd-tabs"><button class="on">Firewall</button><button>Drainage</button></div><p class="desc">Edge segments sit on the grid lines. Cap: <b>${Eng.segCount(v)}/${Eng.segCap(v)}</b> (Hall stage). ${blind ? 'Free placement during the Blind Build.' : 'Installing costs 2 Pondo + 1 worker action.'}</p>`;
+  let html = `<div class="wd-tabs"><button class="on">Firewall</button><button>Drainage</button></div><p class="desc">Walls and drains sit on the lines between tiles. Built: <b>${Eng.segCount(v)}/${Eng.segCap(v)}</b> (Hall stage). ${blind ? 'Free placement during the Blind Build.' : 'Installing costs 2 Pondo + 1 worker action.'}</p>`;
   if (e) {
     html += `<div class="detail"><div class="dhead"><img src="${A(e.type === 'wall' ? 'w_wall' : 'w_drain')}" alt=""><div><b class="lil" style="font-size:18px">${e.type === 'wall' ? (coastal ? 'Seawall (Firewall)' : 'Firewall') : 'Drainage canal'}</b><div class="hpbar"><i style="width:${e.hp / 2 * 100}%"></i><span>${e.hp}/2 HP</span></div></div></div>
     <p class="desc">${e.type === 'wall' ? 'Blocks Fire damage & Burning crossing this edge.' + (coastal ? ' Coastal: −2 Tsunami damage to this Row 1 tile.' : '') : 'Blocks Flood crossing this edge; −1 Flood to each touching tile (max −2); 2+ drains = cannot Flood; irrigates Farms.'}</p><div class="acts">`;
@@ -5161,50 +5166,52 @@ function logModal(tab = 'all', keep) {
   const on = OPP(), mine = (t) => !(t.startsWith(on) || /^🤖|^(The )?CPU\b|^Opponent/.test(t)), icon = (t) => /played|declared/.test(t) ? (/Signal/.test(t) ? '🌀' : '🃏') : /Built|Upgraded|Rebuilt|STAGE/.test(t) ? '🏗️' : /Repaired/.test(t) ? '🔧' : /Firewall|Drainage/.test(t) ? '🧱' : /Evacuat/.test(t) ? '🦺' : /Pondo|Food|resident/.test(t) ? '💰' : /damage|destroy|burn|flood|injur/i.test(t) ? '💥' : /deck|layout/i.test(t) ? '📋' : '•';
   const rows = GAME.log.filter(l => tab === 'all' || (tab === 'me' ? mine(l.text) : !mine(l.text))).slice(-150).reverse();
   let html = '', lastR = null;
-  for (const l of rows) { if (l.r !== lastR) { html += `<div class="lg-r">Round ${l.r || 'Setup'}</div>`; lastR = l.r; } html += `<div class="lg-e ${mine(l.text) ? 'me' : 'op'}"><i>${icon(l.text)}</i><span>${esc(l.text)}</span></div>`; }
+  for (const l of rows) { if (l.r !== lastR) { html += `<div class="lg-r">${l.r ? (GAME.S && GAME.S.rounds ? 'Round ' + ((GAME.S.rounds.indexOf(l.r) + 1) || l.r) : 'Round ' + l.r) : 'Setup'}</div>`; lastR = l.r; }
+    const em = l.text.match(/^(\p{Extended_Pictographic}[\uFE0F\u200D\p{Extended_Pictographic}]*)\s*/u); const ic = em ? em[1] : icon(l.text), tx = em ? l.text.slice(em[0].length) : l.text;
+    html += `<div class="lg-e ${mine(l.text) ? 'me' : 'op'}"><i>${ic}</i><span>${esc(tx)}</span></div>`; }
   modal('📜 Event log', `<div class="lg-tabs">${[['all', 'All'], ['me', 'You'], ['op', esc(OPP())]].map(([k, n]) => `<button class="${k === tab ? 'on' : ''}" data-t="${k}">${n}</button>`).join('')}</div><div class="lg-list" id="lgList">${html || '<p style="color:#9fb8e8">No events yet.</p>'}</div>`, [{ label: 'CLOSE', cls: 'gold', fn: () => { GAME.logOpen = false; closeModal(); } }], { wide: true });
   $('mB').querySelectorAll('.lg-tabs button').forEach(b => b.onclick = () => logModal(b.dataset.t)); if (keep) $('lgList').scrollTop = sc;
   $('mX').onclick = () => { GAME.logOpen = false; closeModal(); };
 }
 function cardModal(id, note, back) {
   const c = CARDS[id];
-  modal(`${FAM_ICON[c.fam]} ${esc(c.name)}`, `<div style="display:flex;gap:14px;flex-wrap:wrap"><img src="${ASSETS['card_' + id]}" style="width:min(220px,48vw);border-radius:10px"><div style="flex:1;min-width:200px">${note ? `<p style="color:var(--gold)">${esc(note)}</p>` : ''}<p><b>${id === 'feeding' ? '2 CP + 2 Food' : c.cp + ' CP'}</b> · ${c.kind === 'buff' ? 'Preparedness · ' + c.tag : 'Level ' + (c.lvl > 3 ? 'MAX' : c.lvl) + ' ' + c.fam} · Unlocks at Round ${c.unlock}${c.exhaust ? ' · one use per match' : ''}</p><div class="detail" style="font-family:'Pixelify Sans';font-size:16px">${esc(c.text)}</div>${c.self ? '<p>✔ May target your own village to put out fires (its damage still applies).</p>' : ''}</div></div>`, back ? [{ label: '← Back', fn: back }] : []);
+  modal(`${FAM_ICON[c.fam]} ${esc(c.name)}`, `<div style="display:flex;gap:14px;flex-wrap:wrap"><img src="${ASSETS['card_' + id]}" style="width:min(220px,48vw);border-radius:10px"><div style="flex:1;min-width:200px">${note ? `<p style="color:var(--gold)">${esc(note)}</p>` : ''}<p><b>${id === 'feeding' ? '2 CP + 2 Food' : c.cp + ' CP'}</b> · ${c.kind === 'buff' ? 'Preparedness · ' + c.tag : 'Level ' + (c.lvl > 3 ? 'MAX' : c.lvl) + ' ' + c.fam} · Unlocks at Round ${c.unlock}${c.exhaust ? ' · one use per match' : ''}</p><div class="detail" style="font-family:'Pixelify Sans';font-size:16px">${esc(c.text)}</div>${c.self ? '<p>✔ Can target your own barangay to put out fires (its damage still applies).</p>' : ''}</div></div>`, back ? [{ label: '← Back', fn: back }] : []);
 }
 function howTo_v1() {
   modal('❓ How to play', `
-  <h3>🎯 Goal</h3><p>You are the Punong Barangay in a <b>Disaster Simulation League</b>. You defend your village and act as the hazard controller for your opponent's. After Round 10 a Tsunami hits both villages — the highest <b>Village Integrity %</b> wins (or drop your rival below 20% Integrity during the rounds for a Knockout).</p>
-  <h3>🏗️ 1 · Blind Build</h3><p>Spend 40 Pondo. Place the <b>Barangay Hall</b> first, then at least 8 buildings total. Use 🧱 to put <b>Firewalls</b> and <b>Drainage</b> on the lines between tiles. Row 1 faces the sea. Tap <b>📋 SAMPLE</b> for a ready layout.</p>
+  <h3>🎯 Goal</h3><p>You are the Punong Barangay in a <b>Disaster Simulation League</b>. You defend your barangay and send hazards at your opponent's. After Round 10 a Tsunami hits both barangays — the highest <b>Village Integrity %</b> wins (or drop your rival below 20% Integrity during the rounds for a Knockout).</p>
+  <h3>🏗️ 1 · Blind Build</h3><p>Spend 40 Pondo. Place the <b>Barangay Hall</b> first, then at least 8 buildings total. Use 🧱 to put <b>Firewalls</b> and <b>Drainage</b> on the lines between tiles. Row 1 faces the sea. Tap <b>📋 STARTER</b> for a ready-made layout.</p>
   <h3>🔁 2 · Each turn</h3><p><b>Upkeep</b> runs automatically (firefighters, healing, income, food). You gain <b>CP</b> (3 → 10 over the match). Then:</p>
-  <ul><li><b>Tap a card</b> → tap a target tile → read the live damage preview → <b>PLAY CARD</b>.</li><li>Disasters hit the opponent. Wind & Rain may target your own village to put out fires.</li><li>Tap your tiles to <b>build, upgrade, repair, hire, train or evacuate</b>. Building needs Pondo + a 🔨 worker action.</li><li><b>END TURN</b>: burning tiles take damage, then discard 1 and draw back to 5.</li></ul>
-  <h3>🔥 Spread & counters</h3><ul><li>Disasters spread to adjacent tiles exactly as the card says. <b>Firewalls</b> block fire spread, <b>Drainage</b> blocks flood spread, and <b>open tiles are firebreaks</b>.</li><li>Earthquakes deal Raw damage that ignores walls and materials and <b>breaks segments</b>.</li><li>Concrete resists fire/wind, nipa huts resist floods, Fire Stations give −1 Fire to covered tiles, Groves give −1 Wind/Flood.</li></ul>
+  <ul><li><b>Tap a card</b> → tap a target tile → read the live damage preview → <b>PLAY CARD</b>.</li><li>Hazards hit your opponent. Wind and Rain cards may also target your own barangay to put out fires.</li><li>Tap your tiles to <b>build, upgrade, repair, hire, train or evacuate</b>. Building needs Pondo + a 🔨 worker action.</li><li><b>END TURN</b>: burning tiles take damage, then discard 1 and draw back to 5.</li></ul>
+  <h3>🔥 Spread & counters</h3><ul><li>Hazards spread to adjacent tiles exactly as the card says. <b>Firewalls</b> block fire spread, <b>Drainage</b> blocks flood spread, and <b>open tiles are firebreaks</b>.</li><li>Earthquakes deal Raw damage that ignores walls and materials and <b>breaks walls and drains</b>.</li><li>Concrete resists fire/wind, nipa huts resist floods, Fire Stations give −1 Fire to covered tiles, Groves give −1 Wind/Flood.</li></ul>
   <h3>🌀 Signal No. 5</h3><p>Every deck has one, but it never sits in your shuffled deck: it waits in your <b>Command slot</b> and joins your hand at the start of Round 8. Declare it in Round 8 or 9 for 9 CP. It lands at the start of your next turn: <b>1 Wind + 1 Flood</b> on everything, +1 Wind in the 2×2 Eye. The defender always gets one full turn to <b>evacuate</b>, drain and plant trees. Unused, it expires after Round 9.</p>
   <h3>🎮 Controls</h3><p>Drag to pan when zoomed · pinch or scroll to zoom · double-tap to reset · 🏡/⚔️ tabs switch villages · 🔤 tile labels · 📜 log · tap the PAGASA panel to see your next draw.</p>`, [{ label: 'GOT IT', cls: 'gold', fn: closeModal }]);
 }
 function rulebookTables() {
   const T = {
     bld: () => `<table><tr><th>Building</th><th>L1</th><th>Cost</th><th>Power</th><th>Function</th><th>Upgrades</th><th>Max</th></tr>${['hall', ...BUILDABLE].map(t => { const L = BLD[t].lv; return `<tr><td>${BLD[t].icon} ${BLD[t].name}</td><td>${MAT_LABEL[L[0].mat]}${L[0].elev ? ', Elevated' : ''} / ${L[0].hp}</td><td>${L[0].cost || 'Free'}</td><td>${t === 'hall' ? '+3' : t === 'substation' ? '+' + L[0].supply : L[0].power || 0}</td><td>${BLD[t].desc}</td><td>${L.slice(1).map((n, k) => `L${k + 2} ${n.title} (${MAT_LABEL[n.mat]} ${n.hp}HP, ${n.cost}${n.kp ? '+' + n.kp + 'KP' : ''})`).join('<br>')}</td><td>${BLD[t].max >= 99 ? '—' : BLD[t].max}</td></tr>`; }).join('')}</table>`,
-    dis: () => `<table><tr><th>Card</th><th>Lvl</th><th>CP</th><th>Unlock</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'disaster').map(i => `<tr><td>${FAM_ICON[CARDS[i].fam]} ${CARDS[i].name}</td><td>${CARDS[i].lvl > 3 ? 'Max' : CARDS[i].lvl}</td><td>${CARDS[i].cp}</td><td>Round ${CARDS[i].unlock}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table>`,
-    buff: () => `<table><tr><th>Card</th><th>CP</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'buff').map(i => `<tr><td>🛡️ ${CARDS[i].name}</td><td>${CARDS[i].cp}${CARDS[i].food ? ' + 2 Food' : ''}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table><p>No buff increases attack. Buffs target your own village.</p>`,
-    dmg: () => `<table><tr><th>Tag</th><th>Fire</th><th>Wind</th><th>Flood</th><th>Raw</th></tr><tr><td>Light (nipa)</td><td>+1</td><td>+1</td><td>0</td><td>0</td></tr><tr><td>Elevated</td><td>—</td><td>—</td><td>−1</td><td>—</td></tr><tr><td>Standard</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Concrete</td><td>−1, never Burns</td><td>−1</td><td>0</td><td>0</td></tr><tr><td>Retrofitted</td><td>—</td><td>—</td><td>—</td><td>−1</td></tr></table>
-      <h3>Resolution order</h3><ol><li>Affected tiles; remove damage crossing a Firewall (Fire) or Drainage (Flood). Raw ignores edges.</li><li>Base damage → material modifiers → mitigation (Fire Response −1, Drainage −1/segment max −2, Grove −1 Wind/Flood, Drill & Retrofit −1 Raw).</li><li>Floor at 0, reduce HP, injure occupants (minus Rescue), place statuses, extinguish, update states.</li></ol>
-      <h3>Statuses</h3><p><b>Burning Ln</b>: at the owner's Burn step deals 1 Fire, then drops a level. <b>Flooded</b>: no production at next upkeep; a Flooded Substation shorts (1 Raw to neighbours) unless it has a drain.</p>`,
-    turn: () => `<ol><li><b>Landfall</b>: your pending Signal No. 5 / Aftershock resolves on the opponent.</li><li><b>Upkeep</b>: (a) Firefighters extinguish (b) worker actions (c) BHWs heal (d) production (e) food & growth (f) injured count down (g) floods drain.</li><li><b>Command</b>: gain CP (3,4,5,6,7,8,9,10,10,10) + max 1 carry-over.</li><li><b>Action</b>: play cards, build, upgrade, repair, hire, segments, evacuate, stage up.</li><li><b>Burn</b>: your burning tiles take 1 Fire.</li><li><b>Refresh</b>: discard 1, draw to 5.</li></ol><p>Player A goes first and Player B goes last in <b>every</b> round, so nobody ever takes two turns in a row.</p>`,
-    score: () => `<p><b>Integrity % = 70 × (building HP ÷ max HP) + 30 × (healthy ÷ peak population)</b></p><table><tr><th>Medal</th><th>Condition</th></tr><tr><td>🥉 Bronze</td><td>Opponent ends below 50%</td></tr><tr><td>🥈 Silver</td><td>Opponent's Hall reaches 0 HP at any time</td></tr><tr><td>🥇 Gold</td><td>Opponent Collapses (below 20% Integrity during Rounds 1–10) or loses every building — Knockout</td></tr></table><h3>Tsunami</h3><p>Flood by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0. Seawall −2 (coastal Firewall), Drainage −1/segment, adjacent Grove −1, Elevated −1.</p><p>Tiebreakers: medal → healthy population → Hall HP → <b>Sudden-Death Tsunami</b> (Row 1 = 4, Row 2 = 3, Row 3 = 2, Row 4 = 1). Still tied: draw (groups) or replay with seats swapped (playoffs).</p>`,
+    dis: () => `<table><tr><th>Card</th><th>Lvl</th><th>CP</th><th>Unlock</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'disaster').map(i => `<tr><td>${FAM_ICON[CARDS[i].fam]} ${CARDS[i].name}</td><td>${CARDS[i].lvl > 3 ? 'Max' : CARDS[i].lvl}</td><td>${CARDS[i].cp}</td><td style="white-space:nowrap">Round ${RL(CARDS[i].unlock)}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table>`,
+    buff: () => `<table><tr><th>Card</th><th>CP</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'buff').map(i => `<tr><td>🛡️ ${CARDS[i].name}</td><td>${CARDS[i].cp}${CARDS[i].food ? ' + 2 Food' : ''}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table><p>Preparedness cards never deal damage. They only affect your own barangay.</p>`,
+    dmg: () => `<table><tr><th>Material</th><th>Fire</th><th>Wind</th><th>Flood</th><th>Raw</th></tr><tr><td>Light (nipa)</td><td>+1</td><td>+1</td><td>0</td><td>0</td></tr><tr><td>Elevated</td><td>—</td><td>—</td><td>−1</td><td>—</td></tr><tr><td>Standard</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Concrete</td><td>−1, never Burns</td><td>−1</td><td>0</td><td>0</td></tr><tr><td>Retrofitted</td><td>—</td><td>—</td><td>—</td><td>−1</td></tr></table>
+      <h3>Resolution order</h3><ol><li>Find the tiles hit. Fire that would cross a Firewall, or Flood that would cross a drain, is blocked. Raw damage ignores walls and drains.</li><li>Start from the card’s damage, apply the building’s material (table above), then reductions: Fire Station cover −1 Fire, each drain −1 Flood (max −2), adjacent Grove −1 Wind/Flood, Earthquake Drill or Retrofit −1 Raw.</li><li>Damage never goes below 0. The building loses that much HP, people inside are injured (DRRM Rescue can prevent some), then Burning or Flooded is applied and fires may be put out.</li></ol>
+      <h3>Statuses</h3><p><b>Burning (level 1–3)</b>: at its owner’s Burn step the building takes 1 Fire damage, then the fire drops one level. <b>Flooded</b>: produces nothing at the next upkeep. A flooded Substation shorts out (1 Raw damage to its neighbors) unless a drain touches it.</p>`,
+    turn: () => `<ol><li><b>Landfall</b>: if you declared Signal No. 5 or set up an Aftershock, it hits your opponent now.</li><li><b>Upkeep</b> (automatic): firefighters put out fires → workers get their actions → health workers heal → buildings produce Pondo, Food and KP → residents eat and may grow → untreated injuries count down → floods drain away.</li><li><b>Command</b>: gain Command Points — 3 in Round 1, rising by 1 each round to 10. Up to 1 unspent CP carries over.</li><li><b>Action</b>: play cards, build, upgrade, repair, hire, add walls and drains, evacuate, upgrade the Hall.</li><li><b>Burn</b>: each of your burning buildings takes 1 Fire damage.</li><li><b>Discard</b>: discard 1 card, then draw back to 5.</li></ol><p><b>Turn order:</b> Player A moves first in Rounds 1–5. At the <b>halftime switch</b> (Round 6) the order flips and Player B moves first until the end, so Player B plays two turns in a row once.</p>`,
+    score: () => `<p><b>Integrity % = 70 × (building HP ÷ max HP) + 30 × (healthy ÷ peak population)</b></p><table><tr><th>Medal</th><th>Condition</th></tr><tr><td>🥉 Bronze</td><td>Opponent ends below 50%</td></tr><tr><td>🥈 Silver</td><td>Opponent's Hall reaches 0 HP at any time</td></tr><tr><td>🥇 Gold</td><td>Opponent Collapses (below 20% Integrity during Rounds 1–10) or loses every building — Knockout</td></tr></table><h3>Tsunami</h3><p>Flood by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0. Seawall −2 (coastal Firewall), Drainage −1 per drain, adjacent Grove −1, Elevated −1.</p><p>Tiebreakers: medal → healthy population → Hall HP → <b>Sudden-Death Tsunami</b> (Row 1 = 4, Row 2 = 3, Row 3 = 2, Row 4 = 1). Still tied: draw (groups) or replay with seats swapped (playoffs).</p>`,
   };
   return T;
 }
 function rulebook_v1(tab = 'bld') {
   const T = {
     bld: () => `<table><tr><th>Building</th><th>L1</th><th>Cost</th><th>Power</th><th>Function</th><th>Upgrades</th><th>Max</th></tr>${['hall', ...BUILDABLE].map(t => { const L = BLD[t].lv; return `<tr><td>${BLD[t].icon} ${BLD[t].name}</td><td>${MAT_LABEL[L[0].mat]}${L[0].elev ? ', Elevated' : ''} / ${L[0].hp}</td><td>${L[0].cost || 'Free'}</td><td>${t === 'hall' ? '+3' : t === 'substation' ? '+' + L[0].supply : L[0].power || 0}</td><td>${BLD[t].desc}</td><td>${L.slice(1).map((n, k) => `L${k + 2} ${n.title} (${MAT_LABEL[n.mat]} ${n.hp}HP, ${n.cost}${n.kp ? '+' + n.kp + 'KP' : ''})`).join('<br>')}</td><td>${BLD[t].max >= 99 ? '—' : BLD[t].max}</td></tr>`; }).join('')}</table>`,
-    dis: () => `<table><tr><th>Card</th><th>Lvl</th><th>CP</th><th>Unlock</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'disaster').map(i => `<tr><td>${FAM_ICON[CARDS[i].fam]} ${CARDS[i].name}</td><td>${CARDS[i].lvl > 3 ? 'Max' : CARDS[i].lvl}</td><td>${CARDS[i].cp}</td><td>Round ${CARDS[i].unlock}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table>`,
-    buff: () => `<table><tr><th>Card</th><th>CP</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'buff').map(i => `<tr><td>🛡️ ${CARDS[i].name}</td><td>${CARDS[i].cp}${CARDS[i].food ? ' + 2 Food' : ''}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table><p>No buff increases attack. Buffs target your own village.</p>`,
-    dmg: () => `<table><tr><th>Tag</th><th>Fire</th><th>Wind</th><th>Flood</th><th>Raw</th></tr><tr><td>Light (nipa)</td><td>+1</td><td>+1</td><td>0</td><td>0</td></tr><tr><td>Elevated</td><td>—</td><td>—</td><td>−1</td><td>—</td></tr><tr><td>Standard</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Concrete</td><td>−1, never Burns</td><td>−1</td><td>0</td><td>0</td></tr><tr><td>Retrofitted</td><td>—</td><td>—</td><td>—</td><td>−1</td></tr></table>
-      <h3>Resolution order</h3><ol><li>Affected tiles; remove damage crossing a Firewall (Fire) or Drainage (Flood). Raw ignores edges.</li><li>Base damage → material modifiers → mitigation (Fire Response −1, Drainage −1/segment max −2, Grove −1 Wind/Flood, Drill & Retrofit −1 Raw).</li><li>Floor at 0, reduce HP, injure occupants (minus Rescue), place statuses, extinguish, update states.</li></ol>
-      <h3>Statuses</h3><p><b>Burning Ln</b>: at the owner's Burn step deals 1 Fire, then drops a level. <b>Flooded</b>: no production at next upkeep; a Flooded Substation shorts (1 Raw to neighbours) unless it has a drain.</p>`,
-    turn: () => `<ol><li><b>Landfall</b>: your pending Signal No. 5 / Aftershock resolves on the opponent.</li><li><b>Upkeep</b>: (a) Firefighters extinguish (b) worker actions (c) BHWs heal (d) production (e) food & growth (f) injured count down (g) floods drain.</li><li><b>Command</b>: gain CP (3,4,5,6,7,8,9,10,10,10) + max 1 carry-over.</li><li><b>Action</b>: play cards, build, upgrade, repair, hire, segments, evacuate, stage up.</li><li><b>Burn</b>: your burning tiles take 1 Fire.</li><li><b>Refresh</b>: discard 1, draw to 5.</li></ol><p>Player A goes first and Player B goes last in <b>every</b> round, so nobody ever takes two turns in a row.</p>`,
-    score: () => `<p><b>Integrity % = 70 × (building HP ÷ max HP) + 30 × (healthy ÷ peak population)</b></p><table><tr><th>Medal</th><th>Condition</th></tr><tr><td>🥉 Bronze</td><td>Opponent ends below 50%</td></tr><tr><td>🥈 Silver</td><td>Opponent's Hall reaches 0 HP at any time</td></tr><tr><td>🥇 Gold</td><td>Opponent Collapses (below 20% Integrity during Rounds 1–10) or loses every building — Knockout</td></tr></table><h3>Tsunami</h3><p>Flood by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0. Seawall −2 (coastal Firewall), Drainage −1/segment, adjacent Grove −1, Elevated −1.</p><p>Tiebreakers: medal → healthy population → Hall HP → <b>Sudden-Death Tsunami</b> (Row 1 = 4, Row 2 = 3, Row 3 = 2, Row 4 = 1). Still tied: draw (groups) or replay with seats swapped (playoffs).</p>`,
+    dis: () => `<table><tr><th>Card</th><th>Lvl</th><th>CP</th><th>Unlock</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'disaster').map(i => `<tr><td>${FAM_ICON[CARDS[i].fam]} ${CARDS[i].name}</td><td>${CARDS[i].lvl > 3 ? 'Max' : CARDS[i].lvl}</td><td>${CARDS[i].cp}</td><td style="white-space:nowrap">Round ${RL(CARDS[i].unlock)}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table>`,
+    buff: () => `<table><tr><th>Card</th><th>CP</th><th>Effect</th></tr>${CARD_IDS.filter(i => CARDS[i].kind === 'buff').map(i => `<tr><td>🛡️ ${CARDS[i].name}</td><td>${CARDS[i].cp}${CARDS[i].food ? ' + 2 Food' : ''}</td><td>${CARDS[i].text}</td></tr>`).join('')}</table><p>Preparedness cards never deal damage. They only affect your own barangay.</p>`,
+    dmg: () => `<table><tr><th>Material</th><th>Fire</th><th>Wind</th><th>Flood</th><th>Raw</th></tr><tr><td>Light (nipa)</td><td>+1</td><td>+1</td><td>0</td><td>0</td></tr><tr><td>Elevated</td><td>—</td><td>—</td><td>−1</td><td>—</td></tr><tr><td>Standard</td><td>0</td><td>0</td><td>0</td><td>0</td></tr><tr><td>Concrete</td><td>−1, never Burns</td><td>−1</td><td>0</td><td>0</td></tr><tr><td>Retrofitted</td><td>—</td><td>—</td><td>—</td><td>−1</td></tr></table>
+      <h3>Resolution order</h3><ol><li>Find the tiles hit. Fire that would cross a Firewall, or Flood that would cross a drain, is blocked. Raw damage ignores walls and drains.</li><li>Start from the card’s damage, apply the building’s material (table above), then reductions: Fire Station cover −1 Fire, each drain −1 Flood (max −2), adjacent Grove −1 Wind/Flood, Earthquake Drill or Retrofit −1 Raw.</li><li>Damage never goes below 0. The building loses that much HP, people inside are injured (DRRM Rescue can prevent some), then Burning or Flooded is applied and fires may be put out.</li></ol>
+      <h3>Statuses</h3><p><b>Burning (level 1–3)</b>: at its owner’s Burn step the building takes 1 Fire damage, then the fire drops one level. <b>Flooded</b>: produces nothing at the next upkeep. A flooded Substation shorts out (1 Raw damage to its neighbors) unless a drain touches it.</p>`,
+    turn: () => `<ol><li><b>Landfall</b>: if you declared Signal No. 5 or set up an Aftershock, it hits your opponent now.</li><li><b>Upkeep</b> (automatic): firefighters put out fires → workers get their actions → health workers heal → buildings produce Pondo, Food and KP → residents eat and may grow → untreated injuries count down → floods drain away.</li><li><b>Command</b>: gain Command Points — 3 in Round 1, rising by 1 each round to 10. Up to 1 unspent CP carries over.</li><li><b>Action</b>: play cards, build, upgrade, repair, hire, add walls and drains, evacuate, upgrade the Hall.</li><li><b>Burn</b>: each of your burning buildings takes 1 Fire damage.</li><li><b>Discard</b>: discard 1 card, then draw back to 5.</li></ol><p><b>Turn order:</b> Player A moves first in Rounds 1–5. At the <b>halftime switch</b> (Round 6) the order flips and Player B moves first until the end, so Player B plays two turns in a row once.</p>`,
+    score: () => `<p><b>Integrity % = 70 × (building HP ÷ max HP) + 30 × (healthy ÷ peak population)</b></p><table><tr><th>Medal</th><th>Condition</th></tr><tr><td>🥉 Bronze</td><td>Opponent ends below 50%</td></tr><tr><td>🥈 Silver</td><td>Opponent's Hall reaches 0 HP at any time</td></tr><tr><td>🥇 Gold</td><td>Opponent Collapses (below 20% Integrity during Rounds 1–10) or loses every building — Knockout</td></tr></table><h3>Tsunami</h3><p>Flood by row: Row 1 = 3, Row 2 = 2, Row 3 = 1, Row 4 = 0. Seawall −2 (coastal Firewall), Drainage −1 per drain, adjacent Grove −1, Elevated −1.</p><p>Tiebreakers: medal → healthy population → Hall HP → <b>Sudden-Death Tsunami</b> (Row 1 = 4, Row 2 = 3, Row 3 = 2, Row 4 = 1). Still tied: draw (groups) or replay with seats swapped (playoffs).</p>`,
   };
-  const names = { bld: '🏠 Buildings', dis: '🔥 Disasters', buff: '🛡️ Preparedness', dmg: '🧮 Damage', turn: '🔁 Turn', score: '🏆 Scoring' };
+  const names = { bld: '🏠 Buildings', dis: '🔥 Hazards', buff: '🛡️ Preparedness', dmg: '🧮 Damage', turn: '🔁 Turn', score: '🏆 Scoring' };
   modal('📖 Rulebook', `<div class="rtabs">${Object.keys(T).map(k => `<button data-k="${k}" class="${k === tab ? 'on' : ''}">${names[k]}</button>`).join('')}</div>${T[tab]()}`, [], { wide: true });
   $('mB').querySelectorAll('.rtabs button').forEach(b => b.onclick = () => rulebook(b.dataset.k));
 }
@@ -5326,7 +5333,7 @@ function layoutMode() { const W = window.innerWidth, H = window.innerHeight; if 
 const TIPS = {
   pondo: ['💰 Pondo', 'Your barangay budget. Earned every upkeep from the Hall and healthy residents. Spend it on buildings, upgrades, walls/drains and repairs (1 Pondo = 1 HP).'],
   power: ['⚡ Power (used / supply)', 'The Hall makes 3 power and Substations add more. If buildings need more than you supply, some go offline and stop working.'],
-  food: ['🌾 Food', 'Farms make food; every 2 residents eat 1 per upkeep. With 4+ Food left over your population grows. If you run short the village is Hungry and workers skip their jobs.'],
+  food: ['🌾 Food', 'Farms make food; every 2 residents eat 1 per upkeep. With 4+ Food left over your population grows. If you run short, your barangay goes hungry and workers skip their jobs.'],
   res: ['👥 Residents', 'Healthy residents (🤕 = injured). Residents live in houses and can be hired as workers: tap a Fire Station, Health Center or Construction Office and press an empty worker slot.'],
   kp: ['📘 Knowledge Points (KP)', 'Made by Schools. Spend KP to upgrade your Barangay Hall to the next stage and to train workers into Engineers or Nurses.'],
   act: ['🔨 Worker actions', 'One per healthy Construction Worker each turn. Needed to build, upgrade, add walls/drains and rebuild. Unused actions repair damage automatically at the end of your turn.'],
@@ -5406,7 +5413,7 @@ function openInspect(id, opts = {}) {
   const nl = S ? needLabel(S, id) : null;
   el.innerHTML = `<div class="ip-head"><span class="fam" style="color:${FAM_COLOR[c.fam]}">${FAM_ICON[c.fam]} ${fam}</span><b>${esc(c.name)}</b></div><img src="${ASSETS['card_' + id]}" alt=""><div class="ip-col" style="min-width:0">
     <div class="meta">💰 ${cost} · Unlocks at Round ${c.unlock}${id === 'signal' ? ' (last call Round 9)' : ''}${c.exhaust ? ' · one use per match' : ''}</div>
-    <p>${esc(c.text.charAt(0) + c.text.slice(1).toLowerCase())}</p><div class="desc">🎯 ${how}</div>${nl ? `<div class="warn" style="margin-top:6px">⛔ ${esc(nl.text.replace('🔒 ', 'Locked until '))}</div>` : ''}${opts.play ? `<button class="btn gold ip-play" id="ipPlay">PLAY CARD</button>` : ''}</div>${opts.sticky || opts.play ? '<button class="x" id="inspX">✕</button>' : ''}`;
+    <p>${esc(c.text)}</p><div class="desc">🎯 ${how}</div>${nl ? `<div class="warn" style="margin-top:6px">⛔ ${esc(nl.text.replace('🔒 ', 'Locked until '))}</div>` : ''}${opts.play ? `<button class="btn gold ip-play" id="ipPlay">PLAY CARD</button>` : ''}</div>${opts.sticky || opts.play ? '<button class="x" id="inspX">✕</button>' : ''}`;
   el.classList.remove('hidden'); GAME.inspectHover = !opts.sticky; el.classList.toggle('hov', !opts.sticky && !opts.play); if (!opts.play) el.classList.remove('aim');
   if (opts.play) { $('inspX').onclick = () => cancelSel(); const pb = $('ipPlay'); const sync = () => { if (!$('ipPlay')) return clearInterval(GAME.ipT); const bp = $('btnPlay'); pb.disabled = bp.classList.contains('hidden') || bp.disabled; pb.textContent = pb.disabled ? (nl ? nl.text : 'TAP A TARGET') : 'PLAY CARD'; }; clearInterval(GAME.ipT); GAME.ipT = setInterval(sync, 150); sync(); pb.onclick = () => { if (!pb.disabled) onPlayBtn(); }; }
   if (opts.sticky) { $('inspX').onclick = closeInspect; setTimeout(() => document.addEventListener('pointerdown', inspOutside, { once: true }), 50); }
@@ -5416,7 +5423,7 @@ function closeInspect() { $('inspect').classList.add('hidden'); GAME.inspectHove
 function renderSegbar() {
   const sel = GAME.sel; const bar = $('segbar'); if (!sel) { bar.classList.add('hidden'); return; }
   const c = CARDS[sel.id]; let h = '';
-  if (c.self) h += `<div class="seg" id="tgSeg"><button data-v="1" class="${sel.tg.vi === 1 ? 'on' : ''}">⚔️ Opponent</button><button data-v="0" class="${sel.tg.vi === 0 ? 'on' : ''}">🏡 My village</button></div>`;
+  if (c.self) h += `<div class="seg" id="tgSeg"><button data-v="1" class="${sel.tg.vi === 1 ? 'on' : ''}">⚔️ Opponent</button><button data-v="0" class="${sel.tg.vi === 0 ? 'on' : ''}">🏡 My barangay</button></div>`;
   if (c.need.includes('line') && sel.tg.idx != null) h += `<div class="seg" id="lnSeg"><button data-l="row" class="${sel.tg.line === 'row' ? 'on' : ''}">↔ Row ${Math.floor(sel.tg.idx / 4) + 1}</button><button data-l="col" class="${sel.tg.line === 'col' ? 'on' : ''}">↕ Column ${COLS[sel.tg.idx % 4]}</button></div>`;
   if (sel.id === 'tesda') { sel.tg.tesda = sel.tg.tesda || 'kp'; h += `<div class="seg" id="tsSeg"><button data-t="kp" class="${sel.tg.tesda === 'kp' ? 'on' : ''}">📘 +3 KP</button><button data-t="worker" class="${sel.tg.tesda === 'worker' ? 'on' : ''}">🎓 Train a worker</button></div>`; }
   bar.innerHTML = h; bar.classList.toggle('hidden', !h);
