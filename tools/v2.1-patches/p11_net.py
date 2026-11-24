@@ -37,4 +37,8 @@ rep("\n#passfx{",
     "\n#passfx{")
 rep("const RULES_VERSION = '2.1.0';", "const RULES_VERSION = '2.1.0';\nconst NET_VERSION = '2.2';")
 
+# 3) BUG FIX (present since v2.0): the lobby dialog ("Room ABC123" / "Joining ABC123") was never closed when the match
+#    started, so it stayed on top of the coin toss and blocked both players.
+rep("function startOnline(seed, firstHost, oppDeck) {\n", "function startOnline(seed, firstHost, oppDeck) {\n  closeModal();\n")
+
 open(P, 'w', encoding='utf-8').write(h); print('ok')
