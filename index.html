@@ -4009,14 +4009,17 @@ function deckSelect() {
   const lv = online() ? scCv([100, 806, 672, 922]) : `${scCv([104, 846, 664, 916])}<div class="sc-seg" style="${scR(110, 850, 660, 912)}"><button data-l="0" class="${GAME.aiLevel === 0 ? 'on' : ''}"><img src="${A('i_rookie')}" alt="">Rookie</button><button data-l="1" class="${GAME.aiLevel === 1 ? 'on' : ''}"><img src="${A('i_kapitan')}" alt="">Kapitan</button></div>`;
   const st = scOpen('deck', `${scCv([90, 326, 1614, 796])}${tiles.map(tile).join('')}${lv}
     ${online() ? '' : `<button class="qm-btn" id="scQuick" style="${scR(690, 830, 962, 878)}"><span>⚡ QUICK MATCH</span></button><button class="qm-btn hs" id="scHot" style="${scR(690, 884, 962, 922)}"><span>👥 PASS &amp; PLAY</span></button>`}
-    ${scIB('b_view', [980, 836, 1286, 912], 'scView')}${scIB('b_next', [1306, 828, 1606, 912], 'scNext')}`, { esc: () => scClose() });
+    ${scIB('b_view', [980, 836, 1286, 912], 'scView')}${scIB('b_next', [1306, 828, 1606, 912], 'scNext')}${scIB('b_back', [28, 24, 248, 90], 'scDeckBack')}`, { esc: () => deckBack() });
   st.querySelectorAll('.dk').forEach(b => b.onclick = () => { SFX.play('click'); GAME.deckKey = b.dataset.k; if (b.dataset.k === 'custom') { scClose(); deckBuilder(); } else deckSelect(); });
   st.querySelectorAll('.sc-seg button').forEach(b => b.onclick = () => { SFX.play('tap'); GAME.aiLevel = +b.dataset.l; deckSelect(); });
   $('scView').onclick = () => { SFX.play('click'); viewDeck(); };
+  $('scDeckBack').onclick = () => { SFX.play('click'); deckBack(); };
   $('scNext').onclick = () => { SFX.play('click'); GAME.quick = false; if (GAME.mode === 'hotseat') { GAME.mode = 'cpu'; GAME.oppName = 'CPU'; } if (GAME.deckKey === 'custom' && !GAME.custom) { scClose(); return deckBuilder(); } scClose(); online() ? onlineLobby() : coinToss(); };
   if ($('scQuick')) $('scQuick').onclick = () => { SFX.play('click'); GAME.mode = 'cpu'; GAME.oppName = 'CPU'; GAME.quick = true; GAME.aiLevel = 0; scClose(); coinToss(); };
   if ($('scHot')) $('scHot').onclick = () => { SFX.play('click'); scClose(); hotseatMenu(); };
 }
+
+function deckBack() { GAME.mode = 'cpu'; GAME.oppName = 'CPU'; GAME.quick = false; scClose(); }
 
 /* ---------- DECK LIST ---------- */
 function viewDeck(filter = 'all') {
