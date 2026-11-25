@@ -4060,7 +4060,8 @@ function scToss(iAmA, opp, sub, onStart) {
     if (p < 1) requestAnimationFrame(step);
     else {
       coinEl.classList.add('land'); $('tzGlow').classList.add('on');
-      const h = $('tzHead'); h.textContent = iAmA ? 'YOU GO FIRST' : esc(opp).toUpperCase() + ' GOES FIRST'; h.classList.add('pop');
+      const h = $('tzHead'); h.innerHTML = '<span>' + (iAmA ? 'YOU GO FIRST' : esc(opp).toUpperCase() + ' GOES FIRST') + '</span>'; h.classList.add('pop');
+      { const sp = h.firstChild; let fs = 66; h.style.fontSize = fs + 'px'; while (fs > 26 && sp.offsetWidth > h.clientWidth - 70) { fs -= 2; h.style.fontSize = fs + 'px'; } }
       $('tzSub').innerHTML = sub; $('tzBtnWrap').style.visibility = 'visible'; SFX.play('medal');
     }
   };
