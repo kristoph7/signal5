@@ -4077,7 +4077,7 @@ function coinToss() {
   S.seedLog = seed; GAME.log = [];
   if (GAME.quick) { S.rounds = QUICK_ROUNDS.slice(); S.quick = true; }
   const heads = Eng.rand(S) < 0.5; S.playerA = heads ? 0 : 1;
-  if (GAME.quick) scToss(heads, 'CPU', `⚡ Quick Match · 6 rounds · Balanced vs Balanced<br>Player A moves first every round (no halftime switch).`, () => quickSetup());
+  if (GAME.quick) scToss(heads, 'CPU', `⚡ Quick Match · 6 rounds<br>Player A moves first every round.`, () => quickSetup());
   else scToss(heads, 'CPU', `Player A moves first in Rounds 1–5.<br>Player B moves first in Rounds 6–10.`, () => { enterBuild(); toast('🤖 The CPU is playing the ' + esc(cpuDeck.name) + ' deck', 'gold'); });
 }
 /* ---------- PASS & PLAY (v2.1) ---------- */
@@ -4091,7 +4091,7 @@ function hotseatToss(quick) {
   const S = GAME.S = Eng.newGame(seed, deckList(DECKS.balanced), deckList(DECKS.balanced), ['Player 1', 'Player 2']);
   S.seedLog = seed; GAME.log = []; if (quick) { S.rounds = QUICK_ROUNDS.slice(); S.quick = true; }
   const heads = Eng.rand(S) < 0.5; S.playerA = heads ? 0 : 1;
-  scToss(heads, 'Player 2', quick ? `Pass & Play · 6 rounds<br>Player A moves first every round (no halftime switch).` : `Pass & Play · 10 rounds<br>Player A moves first in Rounds 1–5, Player B in 6–10.`, () => hotseatSetup());
+  scToss(heads, 'Player 2', quick ? `Pass & Play · 6 rounds<br>Player A moves first every round.` : `Pass & Play · 10 rounds<br>Player A moves first in Rounds 1–5, Player B in 6–10.`, () => hotseatSetup());
 }
 async function hotseatSetup() {
   const S = GAME.S;
