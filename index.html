@@ -1048,7 +1048,7 @@ const BLD = {
       { title: 'Concrete Fire Station', mat: 'concrete', hp: 10, slots: 3, cover: 2, power: 1, cost: 5, sprite: 'fire', stage: 2 },
     ] },
   cons: { name: 'Construction Office', short: 'Constr.', max: 1, icon: '🏗️', color: '#ff7043',
-    desc: 'Each Construction Worker gives 1 worker action per turn: build, upgrade, repair, or add walls and drains.',
+    desc: 'Each Construction Worker gives 1 worker action per turn: build, upgrade, repair, rebuild, or add walls and drains. Keeps working during a blackout.',
     worker: 'Constr. Worker', workerUp: 'Engineer',
     lv: [
       { title: 'Construction Office', mat: 'standard', hp: 7, slots: 2, power: 1, cost: 5, sprite: 'dpwh', small: true },
@@ -1260,7 +1260,7 @@ const Eng = (() => {
       if (b.type === 'substation' && !b.flood) supply += def(b).supply;
     });
     let demand = 0; const users = [];
-    v.tiles.forEach((b, i) => { if (alive(b) && def(b).power) { demand += def(b).power; users.push(i); } });
+    v.tiles.forEach((b, i) => { if (alive(b) && def(b).power) { demand += def(b).power; if (b.type !== 'cons') users.push(i); } });
     const pri = { school: 0, health: 1, cons: 2, house: 3, fire: 4 };
     users.sort((a, b) => pri[v.tiles[a].type] - pri[v.tiles[b].type]);
     const offs = [];
@@ -1595,6 +1595,7 @@ const Eng = (() => {
     // (b) builders → actions
     const cons = v.tiles.find(b => b && b.type === 'cons');
     v.actions = (!wasHungry && cons && functional(cons)) ? healthyStaff(cons) : 0;
+    v.idleHungry = !!wasHungry;
     v.engActions = Math.min(v.actions, engineers(v));
     // (c) heal
     let healN = 0;
@@ -1672,6 +1673,16 @@ const Eng = (() => {
 
   /* ---------- Player actions (economy) ---------- */
   function needAction(S, v) { return S.phase !== 'build'; }
+  function noActionWhy(v) {
+    const c = v.tiles.find(b => b && b.type === 'cons');
+    if (!c) return 'Build a Construction Office first';
+    if (c.dead) return 'Rebuild your Construction Office first';
+    if (v.idleHungry) return 'Workers skipped this turn (hungry)';
+    if (c.burn > 0) return 'Construction Office is burning';
+    if (c.off || c.short) return 'Construction Office has no power';
+    if (healthyStaff(c) <= 0) return 'Hire a Construction Worker';
+    return 'No worker actions left this turn';
+  }
   function canBuild(S, v, type, i) {
     const blind = S.phase === 'build';
     if (v.tiles[i]) return { ok: false, why: 'Tile occupied' };
@@ -1680,7 +1691,7 @@ const Eng = (() => {
     if (blind && !hall(v)) return { ok: false, why: 'Place the Barangay Hall first' };
     if (countType(v, type) >= BLD[type].max) return { ok: false, why: 'Max ' + BLD[type].max };
     if (v.pondo < d.cost) return { ok: false, why: 'Need ' + d.cost + ' Pondo' };
-    if (!blind && v.actions <= 0) return { ok: false, why: 'Needs a worker action' };
+    if (!blind && v.actions <= 0) return { ok: false, why: noActionWhy(v) };
     return { ok: true, cost: d.cost };
   }
   function build(S, v, type, i) {
@@ -1705,7 +1716,7 @@ const Eng = (() => {
     if (n.stage && stage(v) < n.stage) return { ok: false, why: 'Needs Hall Stage ' + n.stage };
     if (n.engineer && engineers(v) < 1) return { ok: false, why: 'Needs an Engineer' };
     if (v.pondo < n.cost) return { ok: false, why: 'Need ' + n.cost + ' Pondo' };
-    if (v.actions <= 0) return { ok: false, why: 'Needs a worker action' };
+    if (v.actions <= 0) return { ok: false, why: noActionWhy(v) };
     return { ok: true, cost: n.cost };
   }
   function upgrade(S, v, i) {
@@ -1724,7 +1735,7 @@ const Eng = (() => {
     if (h.burn || h.flood) return { ok: false, why: 'Hall Burning/Flooded' };
     if (v.pondo < n.cost) return { ok: false, why: 'Need ' + n.cost + ' Pondo' };
     if (v.kp < n.kp) return { ok: false, why: 'Need ' + n.kp + ' KP' };
-    if (v.actions <= 0) return { ok: false, why: 'Needs a worker action' };
+    if (v.actions <= 0) return { ok: false, why: noActionWhy(v) };
     return { ok: true, cost: n.cost };
   }
   function stageUp(S, v) {
@@ -1758,13 +1769,14 @@ const Eng = (() => {
     if (b.burn || b.flood) return { ok: false, why: 'Burning/Flooded' };
     const cost = v.freeRebuild ? 0 : Math.ceil(b.built / 2);
     if (v.pondo < cost) return { ok: false, why: 'Need ' + cost + ' Pondo' };
-    if (v.actions <= 0) return { ok: false, why: 'Needs a worker action' };
-    return { ok: true, cost };
+    const selfCrew = b.type === 'cons';
+    if (!selfCrew && v.actions <= 0) return { ok: false, why: noActionWhy(v) };
+    return { ok: true, cost, free: selfCrew };
   }
   function rebuild(S, v, i) {
     const c = canRebuild(S, v, i); if (!c.ok) return c;
     const b = v.tiles[i]; v.pondo -= c.cost; if (v.freeRebuild && c.cost === 0) v.freeRebuild = 0;
-    v.actions--; v.engActions = Math.min(v.engActions, v.actions);
+    if (!c.free) { v.actions--; v.engActions = Math.min(v.engActions, v.actions); }
     b.dead = false; b.hp = Math.ceil(b.max / 2); b.last = null; rehome(v); recomputePower(v); return { ok: true };
   }
   function canHire(S, v, i) {
@@ -1776,7 +1788,9 @@ const Eng = (() => {
     if (avail <= 0) return { ok: false, why: 'No free resident' };
     return { ok: true, cost };
   }
-  function hire(S, v, i) { const c = canHire(S, v, i); if (!c.ok) return c; takeHealthyResident(v); v.pondo -= c.cost; v.tiles[i].staff++; return { ok: true }; }
+  function hire(S, v, i) { const c = canHire(S, v, i); if (!c.ok) return c; takeHealthyResident(v); v.pondo -= c.cost; v.tiles[i].staff++;
+    if (S.phase !== 'build' && v.tiles[i].type === 'cons' && functional(v.tiles[i]) && !v.idleHungry) v.actions++;
+    return { ok: true }; }
   function canTrain(S, v, i) {
     const b = v.tiles[i]; if (!alive(b) || !BLD[b.type].workerUp) return { ok: false, why: '' };
     if (b.type === 'cons' && b.lv < 1) return { ok: false, why: 'Engineer needs DPWH (L2)' };
@@ -5189,7 +5203,7 @@ function showBuildingPanel(i) {
       if (d.slots) html += `<p class="desc">Starting residents are auto-assigned to worker slots and houses during the Blind Build.</p>`;
       html += act('🗑️', 'DEMOLISH', 'Refund ' + b.built + ' Pondo', '💰+' + b.built, true, 'aDemo', 'redb'); ids.push(['aDemo', () => Eng.demolish(S, v, i), 'build']);
     } else {
-      if (b.dead) { const c = Eng.canRebuild(S, v, i); html += act('🏗️', 'REBUILD', c.ok ? 'Returns at 50% HP · 1 worker action' : c.why, c.ok ? '💰' + c.cost : '', c.ok, 'aReb', 'goldb'); ids.push(['aReb', () => localEco({ fn: 'rebuild', i }), 'build']); }
+      if (b.dead) { const c = Eng.canRebuild(S, v, i); html += act('🏗️', 'REBUILD', c.ok ? (c.free ? 'Returns at 50% HP · its own crew rebuilds it' : 'Returns at 50% HP · 1 worker action') : c.why, c.ok ? '💰' + c.cost : '', c.ok, 'aReb', 'goldb'); ids.push(['aReb', () => localEco({ fn: 'rebuild', i }), 'build']); }
       else {
         if (nx) { const c = Eng.canUpgrade(S, v, i); const cost = b.type === 'hall' ? `💰${nx.cost} 📘${nx.kp}` : '💰' + nx.cost; html += act(b.type === 'hall' ? '🏛️' : '⬆️', b.type === 'hall' ? 'STAGE UP → ' + nx.title.toUpperCase() : 'UPGRADE → L' + (b.lv + 2), c.ok ? (b.type === 'hall' ? (nx.lv ? '' : '') + (b.lv === 1 ? '+1 CP every round from next round' : 'Unlocks L2 upgrades, Concrete houses, Retrofit') : '1 worker action') : c.why, cost, c.ok, 'aUp', 'goldb'); ids.push(['aUp', () => localEco({ fn: 'upgrade', i }), 'build']); }
         const rp = Eng.canRepair(v, i); const miss = b.max - b.hp;
